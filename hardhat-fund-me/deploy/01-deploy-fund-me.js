@@ -43,7 +43,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     process.env.ETHERSCAN_API_KEY
   ) {
     //verify
-    verify(fundMe);
+    await verify(fundMe, args);
   }
 
   log("----------------------------------------------------");
