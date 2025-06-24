@@ -32,7 +32,7 @@ contract FundMe {
 
     function getPrice() public view returns (uint256) {
         (, int256 price, , , ) = priceFeed.latestRoundData();
-        return uint256(price * 1e10);
+        return uint256(price * 1e10); // chain link provide 8 decimal places value so we multiply with 1e10 to make it 1e18
     }
 
     function getConverstionRate(
