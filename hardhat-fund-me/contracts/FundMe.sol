@@ -2,11 +2,6 @@
 pragma solidity ^0.8.28;
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
-// gas optimiation
-// 523225  before immutable
-// 499748 after immutable
-// 466643  after custom error
-
 // custom error
 error not_owner();
 
@@ -43,7 +38,7 @@ contract FundMe {
     function getConverstionRate(
         uint256 ethAmount
     ) public view returns (uint256) {
-        uint256 ethprice = getPrice();           // 500.000000... 8 -- 100.00...8  ----- 300.0000000 
+        uint256 ethprice = getPrice(); // 500.000000... 8 -- 100.00...8  ----- 300.0000000
         return (ethAmount * ethprice) / 1e18;
     }
 
@@ -55,10 +50,11 @@ contract FundMe {
         for (uint256 i = 0; i < funders.length; i = i + 1) {
             delete funders;
 
-            (bool sucess_tranfer, bytes memory data_return) = payable(
-                msg.sender
-            ).call{value: address(this).balance}("");
-            require(sucess_tranfer, "sender call faile");
+            (bool sucess_tranfer, ) = payable(msg.sender).call{
+                value: address(this).balance
+            }("");
+
+            require(sucess_tranfer, "sender call fail");
         }
     }
 
