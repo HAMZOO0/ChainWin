@@ -1,4 +1,5 @@
 const { expect } = require("chai");
+
 const { deployments, ethers, getNamedAccounts } = require("hardhat");
 
 describe("FundMe Testing ", async () => {
@@ -34,6 +35,12 @@ describe("FundMe Testing ", async () => {
   describe("Constructor", () => {
     it("Should have currect MockV3Aggregator contract address ", async () => {
       expect(MockV3Aggregator.address).to.equal(await FundMe.priceFeed());
+    });
+  });
+
+  describe("fund funcion", () => {
+    it("Should fail if not enough money should receive", async () => {
+      // await expect(FundMe.Fund).to.be.revertedWith("Send more Eth");
     });
   });
 });
