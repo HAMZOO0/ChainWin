@@ -3,6 +3,7 @@ require("dotenv").config();
 require("hardhat-deploy");
 require("@nomiclabs/hardhat-ethers");
 require("hardhat-deploy-ethers");
+require("@nomicfoundation/hardhat-verify");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -12,6 +13,7 @@ module.exports = {
     sepolia: {
       url: process.env.INFURA_URL,
       accounts: [process.env.PRIVATE_KEY],
+      blockConfirmation:6,
     },
 
     localhost: {

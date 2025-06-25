@@ -35,6 +35,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     from: deployer,
     args: [ethUsdPriceFeedAddress],
     log: true,
+    waitConfirmations: network.config.blockConfirmation || 1,
   });
 
   // verify the contract for etherscan , if it is not local network then ...
@@ -43,7 +44,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     process.env.ETHERSCAN_API_KEY
   ) {
     //verify
-    await verify(fundMe, args);
+    await verify(fundMe.address, args);
   }
 
   log("----------------------------------------------------");
