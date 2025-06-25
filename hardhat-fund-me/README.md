@@ -24,3 +24,10 @@ Contract verified
   deployer: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
   user: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8'
 }
+
+---
+
+  //gets the contract’s address and ABI from Hardhat Deploy (just tells you where the contract is and what it can do, like a blueprint).
+    FundMe = await deployments.get("FundMe");
+
+    //connects that contract (address + ABI) to a signer (wallet) so that you can call functions on it , like .fund(), .withdraw(), etc.

@@ -9,9 +9,12 @@ describe("FundMe Testing ", async () => {
 
     // Deploy all contracts with the [all] tag
     await deployments.fixture(["all"]);
-
+    //gets the contract’s address and ABI from Hardhat Deploy (just tells you where the contract is and what it can do, like a blueprint).
     FundMe = await deployments.get("FundMe");
+
+    //connects that contract (address + ABI) to a signer (wallet) so that you can call functions on it , like .fund(), .withdraw(), etc.
     FundMe = await ethers.getContractAt("FundMe", FundMe.address, signer);
+    // console.log("FundMe---------", FundMe);
 
     MockV3Aggregator = await deployments.get("MockV3Aggregator");
     MockV3Aggregator = await ethers.getContractAt(
