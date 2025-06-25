@@ -6,7 +6,7 @@
 // It is used to get the deployment info(like address, ABI, etc.) of a contract that was already deployed using hardhat-deploy.
 
 const { network } = require("hardhat");
-const { developmentChains } = require("../helper-hardhat-config");
+const { developmentChains } = require("../helper-hardhat-config.js");
 const { verify } = require("../utils/verify.js");
 require("dotenv").config();
 

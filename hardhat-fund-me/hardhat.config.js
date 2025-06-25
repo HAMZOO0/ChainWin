@@ -2,7 +2,7 @@
 require("dotenv").config();
 require("hardhat-deploy");
 require("@nomiclabs/hardhat-ethers");
-require("hardhat-deploy-ethers");
+// require("hardhat-deploy-ethers");
 require("@nomicfoundation/hardhat-verify");
 require("solidity-coverage");
 
