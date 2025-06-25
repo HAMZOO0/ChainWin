@@ -1,10 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
+//1 :pragma
 pragma solidity ^0.8.28;
+//2 :imports
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
+//3 : Error code
 // custom error
-error not_owner();
+error FundMe__not_owner(); // we use just not_owner but FundMe__not_owner is good practice
 
+/**
+ * @title FundMe - A simple crowdfunding contract
+ * @author Hamza Sajid
+ * @notice This contract allows users to fund and the owner to withdraw funds.
+ * @dev Utilizes Chainlink price feeds for ETH/USD conversion.
+ */
 contract FundMe {
     address[] public funders; // list of funders
 
@@ -62,10 +71,9 @@ contract FundMe {
         // require (msg.sender == i_owner , "Only Owner can call this function");
         // for gas effecny we use custom error
         if (msg.sender != i_owner) {
-            revert not_owner();
+            revert FundMe__not_owner();
         }
         _; // its means first check the condition then run the code  , if we put it above the require statement then it run the code
-        // the condtio check
     }
 
     receive() external payable {

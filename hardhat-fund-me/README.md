@@ -1,13 +1,18 @@
-# Sample Hardhat Project
+npx hardhat deploy --network sepolia
+Nothing to compile
+B1U7FHQYZ3CIXXU69RDHQVXQIAJ3XE1WZ3
+reusing "FundMe" at 0xd1ffeCD2602326350298F2CCfd7e5E86D65B4F62
+Successfully submitted source code for contract
+contracts/FundMe.sol:FundMe at 0xd1ffeCD2602326350298F2CCfd7e5E86D65B4F62
+for verification on the block explorer. Waiting for verification result...
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+Successfully verified contract FundMe on the block explorer.
+https://sepolia.etherscan.io/address/0xd1ffeCD2602326350298F2CCfd7e5E86D65B4F62#code
 
-Try running some of the following tasks:
+Contract verified
+----------------------------------------------------
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.js
-```
+
+## Two types of Testing 
+ ### 1: Unit  - it done locally 
+ ### 2: Staging   tests are done on testnet (Last Stop !)
