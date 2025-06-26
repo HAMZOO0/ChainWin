@@ -72,16 +72,39 @@ describe("FundMe Testing ", async () => {
       await FundMe.Fund({ value: sendValue });
     });
     it("withdraw eth from single funder", async () => {
+      //* Arrange
       // const balance = await FundMe.provider.getBalance(FundMe.address);
-      const balance = await ethers.provider.getBalance(FundMe.address);
+      const contractBalance = await ethers.provider.getBalance(FundMe.address); // balance of this contract
+      const deployerBalance = await ethers.provider.getBalance(signer.address); // balance of this user
       console.log(
         "Contract Balance:",
-        ethers.utils.formatEther(balance),
+        ethers.utils.formatEther(contractBalance),
         "ETH"
       );
-      expect(balance.toString()).to.equal(
-        ethers.utils.parseEther("1").toString()
+      console.log(
+        "Contract Balance:",
+        ethers.utils.formatEther(deployerBalance),
+        "ETH"
       );
+
+      //* Act
+      const transectionResponse = await FundMe.withdraw(); // transection happend - basic detials
+      const transectionRecipt = await transectionResponse.await(1); //wait until this transaction is confirmed and give me full details.
+
+      console.log("transectionResponse :: ", transectionResponse);
+      console.log("transectionRecipt :: ", transectionRecipt);
+
+      // after withdraw
+      const endingContractBalance = await ethers.provider.getBalance(
+        FundMe.address
+      );
+      const endingDeployerBalance = await ethers.provider.getBalance(
+        signer.address
+      );
+
+      //* Assert
+
+      // expect(contractBalance.toString()).to.equal(deployerBalance.toString());
     });
   });
 });

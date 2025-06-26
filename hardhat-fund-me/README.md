@@ -30,3 +30,6 @@ Contract verified
     FundMe = await deployments.get("FundMe");
 
     //connects that contract (address + ABI) to a signer (wallet) so that you can call functions on it , like .fund(), .withdraw(), etc.
+
+    ---
+    ![alt text](image.png)
