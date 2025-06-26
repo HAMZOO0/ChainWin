@@ -3,7 +3,7 @@ const { developmentChains } = require("../helper-hardhat-config");
 const { Contract } = require("ethers");
 
 const decimal = 8;
-const initalAnswer = 500000000;
+const initalAnswer = 200000000000;
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy, log } = deployments;
@@ -22,4 +22,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   }
 };
 
-module.exports.tags = ["local", "mocks","all"];
+module.exports.tags = ["local", "mocks", "all"];
