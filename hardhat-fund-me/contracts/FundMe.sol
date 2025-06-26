@@ -15,16 +15,16 @@ error FundMe__not_owner(); // we use just not_owner but FundMe__not_owner is goo
  * @dev Utilizes Chainlink price feeds for ETH/USD conversion.
  */
 contract FundMe {
-    address[] private s_funders; // list of funders
+    address[] public funders; // list of funders
     // => this is owner , and it is immutable , same as constant but it is use for run time constant
     address private immutable i_owner;
     uint256 constant minimum_usd = 50 * 1e18;
-    AggregatorV3Interface private s_priceFeed;
-    mapping(address => uint256) private s_fundersWithAmount; // how much ammount shoud each sender sended us
+    AggregatorV3Interface public priceFeed;
+    mapping(address => uint256) public fundersWithAmount; // how much ammount shoud each sender sended us
 
     constructor(address _priceFeed) payable {
         i_owner = msg.sender; // this is owner
-        s_priceFeed = AggregatorV3Interface(_priceFeed);
+        priceFeed = AggregatorV3Interface(_priceFeed);
     }
 
     function Fund() public payable {
@@ -33,12 +33,12 @@ contract FundMe {
             getConverstionRate(msg.value) >= minimum_usd,
             "ETH value must be greater than or equal to 50 USD"
         ); //  1 * 10 ** 18 = 100000000000000000
-        s_fundersWithAmount[msg.sender] = msg.value;
-        s_funders.push(msg.sender);
+        fundersWithAmount[msg.sender] = msg.value;
+        funders.push(msg.sender);
     }
 
     function getPrice() public view returns (uint256) {
-        (, int256 price, , , ) = s_priceFeed.latestRoundData();
+        (, int256 price, , , ) = priceFeed.latestRoundData();
         return uint256(price * 1e10); // chain link provide 8 decimal places value so we multiply with 1e10 to make it 1e18
     }
 
@@ -54,18 +54,16 @@ contract FundMe {
         // require(owner == msg.sender, "only owner can withdraw "); // check the caller of this function is must be ower
 
         // clear array and map
-        for (uint256 i = 0; i < s_funders.length; i = i + 1) {
-            // clear s_fundersWithAmount
+        for (uint256 i = 0; i < funders.length; i = i + 1) {
             for (
                 uint256 funderIndex = 0;
-                funderIndex < s_funders.length;
+                funderIndex < funders.length;
                 funderIndex++
             ) {
-                address funder = s_funders[funderIndex];
-                s_fundersWithAmount[funder] = 0;
+                address funder = funders[funderIndex];
+                fundersWithAmount[funder] = 0;
             }
-            // clear s_funders
-            delete s_funders;
+            delete funders;
 
             (bool sucess_tranfer, ) = payable(msg.sender).call{
                 value: address(this).balance

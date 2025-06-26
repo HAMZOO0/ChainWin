@@ -60,8 +60,8 @@ describe("FundMe Testing ", async () => {
       await FundMe.Fund({ value: sendValue }); // fund first - bcz  in test hardhat reset the state
 
       const lastAddress = await FundMe.funders(0);
-      console.log("lastAddress : ", lastAddress);
-      console.log("signer.address : ", signer.address);
+      // console.log("lastAddress : ", lastAddress);
+      // console.log("signer.address : ", signer.address);
 
       expect(lastAddress).to.equal(signer.address);
     });
@@ -71,6 +71,17 @@ describe("FundMe Testing ", async () => {
     beforeEach(async () => {
       await FundMe.Fund({ value: sendValue });
     });
-    it("", async () => {});
+    it("withdraw eth from single funder", async () => {
+      // const balance = await FundMe.provider.getBalance(FundMe.address);
+      const balance = await ethers.provider.getBalance(FundMe.address);
+      console.log(
+        "Contract Balance:",
+        ethers.utils.formatEther(balance),
+        "ETH"
+      );
+      expect(balance.toString()).to.equal(
+        ethers.utils.parseEther("1").toString()
+      );
+    });
   });
 });
