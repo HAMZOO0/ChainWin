@@ -1,4 +1,7 @@
-const { expect } = require("chai");
+const chai = require("chai");
+const { expect, revertedWith } = require("chai");
+const chaiAsPromised = require("chai-as-promised");
+chai.use(chaiAsPromised);
 
 const { deployments, ethers, getNamedAccounts } = require("hardhat");
 
@@ -40,7 +43,9 @@ describe("FundMe Testing ", async () => {
 
   describe("fund funcion", () => {
     it("Should fail if not enough money should receive", async () => {
-      // await expect(FundMe.Fund).to.be.revertedWith("Send more Eth");
+      await expect(FundMe.Fund()).to.be.rejectedWith(
+        "ETH value must be greater than or equal to 50 USD" // it have same message which i used in fund()
+      );
     });
   });
 });

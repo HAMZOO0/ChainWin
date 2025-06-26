@@ -26,7 +26,6 @@ Contract verified
 }
 
 ---
-
   //gets the contract’s address and ABI from Hardhat Deploy (just tells you where the contract is and what it can do, like a blueprint).
     FundMe = await deployments.get("FundMe");
 
