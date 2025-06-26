@@ -74,25 +74,31 @@ describe("FundMe Testing ", async () => {
     it("withdraw eth from single funder", async () => {
       //* Arrange
       // const balance = await FundMe.provider.getBalance(FundMe.address);
-      const contractBalance = await ethers.provider.getBalance(FundMe.address); // balance of this contract
-      const deployerBalance = await ethers.provider.getBalance(signer.address); // balance of this user
+      const startingContractBalance = await ethers.provider.getBalance(
+        FundMe.address
+      ); // balance of this contract
+      const startingDeployerBalance = await ethers.provider.getBalance(
+        signer.address
+      ); // balance of this user
       console.log(
         "Contract Balance:",
-        ethers.utils.formatEther(contractBalance),
+        ethers.utils.formatEther(startingContractBalance),
         "ETH"
       );
       console.log(
-        "Contract Balance:",
-        ethers.utils.formatEther(deployerBalance),
+        "deployer Balance:",
+        ethers.utils.formatEther(startingDeployerBalance),
         "ETH"
       );
 
       //* Act
       const transectionResponse = await FundMe.withdraw(); // transection happend - basic detials
-      const transectionRecipt = await transectionResponse.await(1); //wait until this transaction is confirmed and give me full details.
+      const transectionRecipt = await transectionResponse.wait(1); //wait until this transaction is confirmed and give me full details.
+      const { gasUsed, effectiveGasPrice } = transectionRecipt;
+      const gasCost = gasUsed.mul(effectiveGasPrice);
 
-      console.log("transectionResponse :: ", transectionResponse);
-      console.log("transectionRecipt :: ", transectionRecipt);
+      // console.log("transectionResponse :: ", transectionResponse);
+      // console.log("transectionRecipt :: ", transectionRecipt);
 
       // after withdraw
       const endingContractBalance = await ethers.provider.getBalance(
@@ -101,10 +107,18 @@ describe("FundMe Testing ", async () => {
       const endingDeployerBalance = await ethers.provider.getBalance(
         signer.address
       );
+      console.log("endingContractBalance : ", endingContractBalance);
+      console.log("endingDeployerBalance : ", endingDeployerBalance);
 
       //* Assert
 
-      // expect(contractBalance.toString()).to.equal(deployerBalance.toString());
+      // 1 : check that contract have zero balance bcz we transfer all eth to owner
+      expect(endingContractBalance.toString()).to.equal("0");
+
+      // 2: check that starting + owner = total
+      expect(
+        startingContractBalance.add(startingDeployerBalance).toString()
+      ).to.equal(endingDeployerBalance.add(gasCost).toString());
     });
   });
 });
