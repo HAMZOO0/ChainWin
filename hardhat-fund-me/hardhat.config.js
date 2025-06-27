@@ -5,6 +5,7 @@ require("@nomiclabs/hardhat-ethers");
 // require("hardhat-deploy-ethers");
 require("@nomicfoundation/hardhat-verify");
 require("solidity-coverage");
+require("hardhat-gas-reporter");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -40,15 +41,16 @@ module.exports = {
       default: 1,
     },
   },
-  // gasReporter: {
-  //   enabled: true,
-  //   currency: "USD",
-  //   coinmarketcap: process.env.COINMARKETCAP_API_KEY,
-  //   // token: "ETH",
-  //   gasPrice: 0.000000001, // ← simulate realistic price (in Gwei)
-  //   // showTimeSpent: true,
-  //   // noColors: true,
-  //   // currencyDisplayPrecision: 8, // ← force display of small USD costs 💸
-  //   // noColors: true,
-  // },
+  gasReporter: {
+    enabled: true,
+    currency: "USD",
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+    token: "ETH",
+    // offline: true,
+    gasPrice: 0.000029218760090611, // ← simulate realistic price (in Gwei)
+    // showTimeSpent: true,
+    // noColors: true,
+    // currencyDisplayPrecision: 8, // ← force display of small USD costs
+    // noColors: true,
+  },
 };

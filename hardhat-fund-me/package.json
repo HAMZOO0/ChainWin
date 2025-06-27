@@ -9,6 +9,7 @@
     "ethers": "^5.7.2",
     "hardhat": "^2.25.0",
     "hardhat-deploy": "^1.0.4",
+    "hardhat-gas-reporter": "^2.3.0",
     "mocha": "^11.7.1",
     "solc": "^0.8.30",
     "solidity-coverage": "^0.8.16",

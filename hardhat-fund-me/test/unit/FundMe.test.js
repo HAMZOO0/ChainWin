@@ -94,6 +94,7 @@ describe("FundMe Testing ", async () => {
       const transectionRecipt = await transectionResponse.wait(1); //wait until this transaction is confirmed and give me full details.
       const { gasUsed, effectiveGasPrice } = transectionRecipt;
       const gasCost = gasUsed.mul(effectiveGasPrice);
+      // console.log("gas cost :: ", gasCost);
 
       // console.log("transectionResponse :: ", transectionResponse);
       // console.log("transectionRecipt :: ", transectionRecipt);
