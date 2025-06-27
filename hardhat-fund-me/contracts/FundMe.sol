@@ -3,17 +3,12 @@
 pragma solidity ^0.8.28;
 //2 :imports
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import "hardhat/console.sol"; // testing logs
 
 //3 : Error code
 // custom error
 error FundMe__not_owner(); // we use just not_owner but FundMe__not_owner is good practice
 
-/**
- * @title FundMe - A simple crowdfunding contract
- * @author Hamza Sajid
- * @notice This contract allows users to fund and the owner to withdraw funds.
- * @dev Utilizes Chainlink price feeds for ETH/USD conversion.
- */
 contract FundMe {
     address[] public funders; // list of funders
     // => this is owner , and it is immutable , same as constant but it is use for run time constant
@@ -35,6 +30,12 @@ contract FundMe {
         ); //  1 * 10 ** 18 = 100000000000000000
         fundersWithAmount[msg.sender] = msg.value;
         funders.push(msg.sender);
+
+        // log print while testing
+        // console.log(
+        //     "Contract balance before withdraw:: ",
+        //     address(this).balance
+        // );
     }
 
     function getPrice() public view returns (uint256) {
@@ -71,6 +72,10 @@ contract FundMe {
 
             require(sucess_tranfer, "sender call fail");
         }
+        // console.log(
+        //     "Contract balance after withdraw:: ",
+        //     address(this).balance
+        // );
     }
 
     modifier OnlyOwner() {
