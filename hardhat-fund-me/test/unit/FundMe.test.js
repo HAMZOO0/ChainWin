@@ -36,7 +36,7 @@ describe("FundMe Testing ", async () => {
 
   describe("Constructor", () => {
     it("Should have currect MockV3Aggregator contract address ", async () => {
-      expect(MockV3Aggregator.address).to.equal(await FundMe.priceFeed());
+      expect(MockV3Aggregator.address).to.equal(await FundMe.s_priceFeed());
     });
   });
 
@@ -48,7 +48,7 @@ describe("FundMe Testing ", async () => {
     });
     it("Should update the fundersWithAmount after adding new transection value ", async () => {
       await FundMe.Fund({ value: sendValue }); // fund function is payable so we use value:  ... to send eth
-      const res = await FundMe.fundersWithAmount(signer.address); // we access the value of this address(key)
+      const res = await FundMe.s_fundersWithAmount(signer.address); // we access the value of this address(key)
       // console.log("res : ", res);
       // console.log("sendValue : ", sendValue);
 
@@ -57,7 +57,7 @@ describe("FundMe Testing ", async () => {
     it("Shoud have same sender address who send the Eth in list", async () => {
       await FundMe.Fund({ value: sendValue }); // fund first - bcz  in test hardhat reset the state
 
-      const lastAddress = await FundMe.funders(0);
+      const lastAddress = await FundMe.s_funders(0);
       // console.log("lastAddress : ", lastAddress);
       // console.log("signer.address : ", signer.address);
 
@@ -170,12 +170,13 @@ describe("FundMe Testing ", async () => {
       // check  fundersWithAmount is empty or not
       for (let index = 1; index < 20; index++) {
         expect(
-          (await FundMe.fundersWithAmount(accounts[index].address)).toString()
+          (await FundMe.s_fundersWithAmount(accounts[index].address)).toString()
         ).to.equal("0");
       }
 
       // funders list is empty after withdraw
-      expect(FundMe.funders.length).to.equal(0);
+      const fundersLength = await FundMe.get_s_funders(); // OR FundMe.funders(index)
+      expect(fundersLength.toNumber()).to.equal(0);
     });
 
     it("Should allow aonly owner to withdraw ", async () => {
@@ -185,6 +186,38 @@ describe("FundMe Testing ", async () => {
       await expect(attackerConnected.withdraw()).to.be.rejectedWith(
         "FundMe__not_owner"
       );
+    });
+
+    it("cheaperWithdraw testing ...", async () => {
+      //! Arrange
+
+      const startingContractBalance = await ethers.provider.getBalance(
+        FundMe.address
+      );
+      const startingDeployerBalance = await ethers.provider.getBalance(
+        signer.address
+      );
+
+      //! Act
+      const transectionResponse = await FundMe.cheaperWithdraw();
+      const transectionRecipt = await transectionResponse.wait(1);
+      const { gasUsed, effectiveGasPrice } = transectionRecipt;
+      const gasCost = gasUsed.mul(effectiveGasPrice);
+
+      const endingContractBalance = await ethers.provider.getBalance(
+        FundMe.address
+      );
+      const endingDeployerBalance = await ethers.provider.getBalance(
+        signer.address
+      );
+
+      //! Assert
+
+      expect(endingContractBalance.toString()).to.equal("0");
+
+      expect(
+        startingContractBalance.add(startingDeployerBalance).toString()
+      ).to.equal(endingDeployerBalance.add(gasCost).toString());
     });
   });
 });

@@ -10,10 +10,10 @@ import "hardhat/console.sol"; // testing logs
 error FundMe__not_owner(); // we use just not_owner but FundMe__not_owner is good practice
 
 contract FundMe {
-    address[] public s_funders; // list of funders
     // => this is owner , and it is immutable , same as constant but it is use for run time constant
     address private immutable i_owner;
-    uint256 constant  MINIMUM_USD = 50 * 1e18;
+    address[] public s_funders; // list of funders
+    uint256 constant MINIMUM_USD = 50 * 1e18;
     AggregatorV3Interface public s_priceFeed;
     mapping(address => uint256) public s_fundersWithAmount; // how much ammount shoud each sender sended us
 
@@ -22,6 +22,10 @@ contract FundMe {
         s_priceFeed = AggregatorV3Interface(_priceFeed);
     }
 
+    function get_s_funders() public view returns (uint256) {
+        console.log("get_s_funders :: ", s_funders.length);
+        return s_funders.length;
+    }
     function Fund() public payable {
         // set minimum ammount of funding  mg  value means user send the xyz ammount
         require(
@@ -51,35 +55,50 @@ contract FundMe {
     }
 
     // owner of this conract can withdraw this
-    function withdraw() public OnlyOwner {
+    function withdraw() public onlyOwner {
         // require(owner == msg.sender, "only owner can withdraw "); // check the caller of this function is must be ower
 
         // clear array and map
-        for (uint256 i = 0; i < s_funders.length; i = i + 1) {
-            for (
-                uint256 funderIndex = 0;
-                funderIndex < s_funders.length;
-                funderIndex++
-            ) {
-                address funder = s_funders[funderIndex];
-                s_fundersWithAmount[funder] = 0;
-                console.log(" fundersWithAmount[funder] :: ",  s_fundersWithAmount[funder] );
-            }
-            delete s_funders;
-
-            (bool sucess_tranfer, ) = payable(msg.sender).call{
-                value: address(this).balance
-            }("");
-
-            require(sucess_tranfer, "sender call fail");
+        for (
+            uint256 funderIndex = 0;
+            funderIndex < s_funders.length;
+            funderIndex++
+        ) {
+            // address funder = s_funders[funderIndex];
+            s_fundersWithAmount[s_funders[funderIndex]] = 0;
+            console.log(
+                " fundersWithAmount[funder] :: ",
+                s_fundersWithAmount[s_funders[funderIndex]]
+            );
         }
-        // console.log(
-        //     "Contract balance after withdraw:: ",
-        //     address(this).balance
-        // );
+        delete s_funders;
+
+        (bool sucess_tranfer, ) = payable(msg.sender).call{
+            value: address(this).balance
+        }("");
+
+        require(sucess_tranfer, "sender call fail");
+    }
+    // console.log(
+    //     "Contract balance after withdraw:: ",
+    //     address(this).balance
+    // );
+
+    function cheaperWithdraw() public onlyOwner {
+        address[] memory funders = s_funders;
+        for (uint256 index = 0; index < funders.length; index++) {
+            s_fundersWithAmount[funders[index]] = 0; // replacemnt of this line :             address fundKey = funders[index];
+        }
+        delete s_funders;
+        delete funders;
+
+        (bool sucess_tranfer, ) = payable(msg.sender).call{
+            value: address(this).balance
+        }("");
+        require(sucess_tranfer, "sender call fail - withdraw");
     }
 
-    modifier OnlyOwner() {
+    modifier onlyOwner() {
         // require (msg.sender == i_owner , "Only Owner can call this function");
         // for gas effecny we use custom error
         if (msg.sender != i_owner) {
