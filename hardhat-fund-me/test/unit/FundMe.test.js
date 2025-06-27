@@ -3,7 +3,6 @@ const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised); // use async func inside the expect
 const { expect } = chai;
-
 describe("FundMe Testing ", async () => {
   let FundMe, MockV3Aggregator, signer;
   const sendValue = ethers.utils.parseEther("1"); // 1 ETH
@@ -176,6 +175,15 @@ describe("FundMe Testing ", async () => {
 
       // funders list is empty after withdraw
       expect(FundMe.funders.length).to.equal(0);
+    });
+
+    it("Should allow aonly owner to withdraw ", async () => {
+      const accounts = await ethers.getSigners();
+      const attacker = accounts[1]; // this is not owner
+      const attackerConnected = await FundMe.connect(attacker);
+      await expect(attackerConnected.withdraw()).to.be.rejectedWith(
+        "FundMe__not_owner"
+      );
     });
   });
 });
