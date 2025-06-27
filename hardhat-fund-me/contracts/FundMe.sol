@@ -63,6 +63,7 @@ contract FundMe {
             ) {
                 address funder = funders[funderIndex];
                 fundersWithAmount[funder] = 0;
+                console.log(" fundersWithAmount[funder] :: ",  fundersWithAmount[funder] );
             }
             delete funders;
 

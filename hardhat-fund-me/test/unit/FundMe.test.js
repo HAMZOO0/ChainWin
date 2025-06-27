@@ -122,10 +122,9 @@ describe("FundMe Testing ", async () => {
 
     it("Should allow us to withdraw mutiple funders", async () => {
       // Arrange
-      const accounts = await ethers.getSigner();
+      const accounts = await ethers.getSigners();
       for (let index = 1; index < accounts.length; index++) {
-        const element = array[index];
-        const getConnected = FundMe.connect(element);
+        const getConnected = FundMe.connect(accounts[index]);
         await getConnected.Fund({ value: sendValue });
       }
       const startingContractBalance = await ethers.provider.getBalance(
@@ -167,6 +166,16 @@ describe("FundMe Testing ", async () => {
       expect(
         startingContractBalance.add(startingDeployerBalance).toString()
       ).to.equal(endingDeployerBalance.add(gasCost).toString());
+
+      // check  fundersWithAmount is empty or not
+      for (let index = 1; index < 20; index++) {
+        expect(
+          (await FundMe.fundersWithAmount(accounts[index].address)).toString()
+        ).to.equal("0");
+      }
+
+      // funders list is empty after withdraw
+      expect(FundMe.funders.length).to.equal(0);
     });
   });
 });
