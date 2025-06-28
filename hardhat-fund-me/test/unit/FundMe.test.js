@@ -36,7 +36,7 @@ describe("FundMe Testing ", async () => {
 
   describe("Constructor", () => {
     it("Should have currect MockV3Aggregator contract address ", async () => {
-      expect(MockV3Aggregator.address).to.equal(await FundMe.s_priceFeed());
+      expect(MockV3Aggregator.address).to.equal(await FundMe.getsPriceFeed());
     });
   });
 
@@ -48,7 +48,7 @@ describe("FundMe Testing ", async () => {
     });
     it("Should update the fundersWithAmount after adding new transection value ", async () => {
       await FundMe.Fund({ value: sendValue }); // fund function is payable so we use value:  ... to send eth
-      const res = await FundMe.s_fundersWithAmount(signer.address); // we access the value of this address(key)
+      const res = await FundMe.getsFundersWithAmount(signer.address); // we access the value of this address(key)
       // console.log("res : ", res);
       // console.log("sendValue : ", sendValue);
 
@@ -57,7 +57,7 @@ describe("FundMe Testing ", async () => {
     it("Shoud have same sender address who send the Eth in list", async () => {
       await FundMe.Fund({ value: sendValue }); // fund first - bcz  in test hardhat reset the state
 
-      const lastAddress = await FundMe.s_funders(0);
+      const lastAddress = await FundMe.getFunders(0);
       // console.log("lastAddress : ", lastAddress);
       // console.log("signer.address : ", signer.address);
 
@@ -170,12 +170,12 @@ describe("FundMe Testing ", async () => {
       // check  fundersWithAmount is empty or not
       for (let index = 1; index < 20; index++) {
         expect(
-          (await FundMe.s_fundersWithAmount(accounts[index].address)).toString()
+          (await FundMe.getsFundersWithAmount(accounts[index].address)).toString()
         ).to.equal("0");
       }
 
       // funders list is empty after withdraw
-      const fundersLength = await FundMe.get_s_funders(); // OR FundMe.funders(index)
+      const fundersLength = await FundMe.getFundersLength(); // OR FundMe.funders(index)
       expect(fundersLength.toNumber()).to.equal(0);
     });
 

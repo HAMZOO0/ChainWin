@@ -12,20 +12,16 @@ error FundMe__not_owner(); // we use just not_owner but FundMe__not_owner is goo
 contract FundMe {
     // => this is owner , and it is immutable , same as constant but it is use for run time constant
     address private immutable i_owner;
-    address[] public s_funders; // list of funders
+    address[] private s_funders; // list of funders
     uint256 constant MINIMUM_USD = 50 * 1e18;
-    AggregatorV3Interface public s_priceFeed;
-    mapping(address => uint256) public s_fundersWithAmount; // how much ammount shoud each sender sended us
+    AggregatorV3Interface private s_priceFeed;
+    mapping(address => uint256) private s_fundersWithAmount; // how much ammount shoud each sender sended us
 
     constructor(address _priceFeed) payable {
         i_owner = msg.sender; // this is owner
         s_priceFeed = AggregatorV3Interface(_priceFeed);
     }
 
-    function get_s_funders() public view returns (uint256) {
-        console.log("get_s_funders :: ", s_funders.length);
-        return s_funders.length;
-    }
     function Fund() public payable {
         // set minimum ammount of funding  mg  value means user send the xyz ammount
         require(
@@ -112,5 +108,25 @@ contract FundMe {
     }
     fallback() external payable {
         Fund();
+    }
+
+
+    //-----------
+    // Getters
+    //-----------
+
+    function getFundersLength() public view returns (uint256) {
+        console.log("get_s_funders :: ", s_funders.length);
+        return s_funders.length;
+    }
+
+    function getFunders(uint256 index) public view returns (address) {
+        return s_funders[index];
+    }
+    function getsPriceFeed() public view returns (AggregatorV3Interface) {
+        return s_priceFeed;
+    }
+    function getsFundersWithAmount(address funderIndex) public view returns (uint256) {
+        return s_fundersWithAmount[funderIndex];
     }
 }
