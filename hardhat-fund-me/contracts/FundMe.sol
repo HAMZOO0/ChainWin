@@ -110,7 +110,6 @@ contract FundMe {
         Fund();
     }
 
-
     //-----------
     // Getters
     //-----------
@@ -126,7 +125,9 @@ contract FundMe {
     function getsPriceFeed() public view returns (AggregatorV3Interface) {
         return s_priceFeed;
     }
-    function getsFundersWithAmount(address funderIndex) public view returns (uint256) {
+    function getsFundersWithAmount(
+        address funderIndex
+    ) public view returns (uint256) {
         return s_fundersWithAmount[funderIndex];
     }
 }
