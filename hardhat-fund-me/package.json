@@ -1,4 +1,11 @@
 {
+  "name": "hardhat-fund-me",
+  "author": {
+    "name": "Hamza Sajid",
+    "email": "hamzakhan14722@gmail.com"
+  },
+  "version": "1.0.0",
+  "description": "A Hardhat project for a simple fund me contract",
   "devDependencies": {
     "@chainlink/contracts": "^0.6.1",
     "@nomicfoundation/hardhat-verify": "^2.0.14",
@@ -15,5 +22,12 @@
     "solidity-coverage": "^0.8.16",
     "solidity-docgen": "^0.6.0-beta.36",
     "zksync-ethers": "^5.10.0"
+  },
+  "scripts": {
+      "test" :"npx hardhat test",
+      "test:staging" :"npx hardhat test --network sepolia",
+      "test:local" :"npx hardhat test --network localhost",
+      "coverage": "npx hardhat coverage"
+
   }
 }
