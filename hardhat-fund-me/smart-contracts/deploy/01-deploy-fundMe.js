@@ -12,42 +12,40 @@ require("dotenv").config();
 
 // All these arguments are automatically passed by hardhat-deploy hre.getNamedAccount , hre.eployments
 module.exports = async ({ getNamedAccounts, deployments }) => {
-  console.log(process.env.ETHERSCAN_API_KEY);
+   const { deploy, log, get } = deployments;
+   // here we get deploter accont  - we mention this in hardhat.config.js also
+   const { deployer } = await getNamedAccounts();
 
-  const { deploy, log, get } = deployments;
-  // here we get deploter accont  - we mention this in hardhat.config.js also
-  const { deployer } = await getNamedAccounts();
-  const chainid = network.config.chainId;
+   let ethUsdPriceFeedAddress;
 
-  let ethUsdPriceFeedAddress;
-  if (developmentChains.includes(network.name)) {
-    // Get address of mock contract deployed locally
-    const mockContract = await deployments.get("MockV3Aggregator");
-    ethUsdPriceFeedAddress = mockContract.address;
-  }
-  //  Real Chainlink price feed on Sepolia
-  else {
-    ethUsdPriceFeedAddress = "0x694AA1769357215DE4FAC081bf1f309aDC325306"; // Sepolia
-  }
-  const args = [ethUsdPriceFeedAddress];
+   if (developmentChains.includes(network.name)) {
+      // Get address of mock contract deployed locally
+      const mockContract = await deployments.get("MockV3Aggregator");
+      ethUsdPriceFeedAddress = mockContract.address;
+   }
+   //  Real Chainlink price feed on Sepolia
+   else {
+      ethUsdPriceFeedAddress = "0x694AA1769357215DE4FAC081bf1f309aDC325306"; // Sepolia - it is public address
+   }
+   const args = [ethUsdPriceFeedAddress];
 
-  const fundMe = await deploy("FundMe", {
-    from: deployer,
-    args: [ethUsdPriceFeedAddress],
-    log: true,
-    waitConfirmations: network.config.blockConfirmation || 1,
-  });
+   const fundMe = await deploy("FundMe", {
+      from: deployer,
+      args: [ethUsdPriceFeedAddress],
+      log: true,
+      waitConfirmations: network.config.blockConfirmation || 1,
+   });
 
-  // verify the contract for etherscan , if it is not local network then ...
-  if (
-    !developmentChains.includes(network.name) &&
-    process.env.ETHERSCAN_API_KEY
-  ) {
-    //verify
-    await verify(fundMe.address, args);
-  }
+   // verify the contract for etherscan , if it is not local network then ...
+   if (
+      !developmentChains.includes(network.name) &&
+      process.env.ETHERSCAN_API_KEY
+   ) {
+      //verify
+      await verify(fundMe.address, args);
+   }
 
-  log("----------------------------------------------------");
+   log("----------------------------------------------------");
 };
 
 module.exports.tags = ["Sepolia", "all"];
