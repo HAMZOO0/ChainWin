@@ -3,7 +3,7 @@ const { developmentChains } = require("../helper-hardhat-config");
 const { Contract } = require("ethers");
 
 const decimal = 8;
-const initalAnswer = 300000000000;
+const initalAnswer = 100000000000;
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
    const { deploy, log } = deployments;
@@ -15,7 +15,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
          contract: "MockV3Aggregator",
          from: deployer,
          log: true,
-         args: [decimal, initalAnswer],
+         args: [decimal, initalAnswer], //These get stored in the smart contract storage
       });
       log("mock deployed !");
       log("----------------------------------------------------");

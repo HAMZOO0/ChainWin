@@ -1,4 +1,4 @@
-export const address = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
+export const ContractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 export const abi = [
    {
       inputs: [
@@ -15,10 +15,6 @@ export const abi = [
       inputs: [],
       name: "FundMe__not_owner",
       type: "error",
-   },
-   {
-      stateMutability: "payable",
-      type: "fallback",
    },
    {
       inputs: [],
@@ -87,6 +83,19 @@ export const abi = [
    },
    {
       inputs: [],
+      name: "getOwner",
+      outputs: [
+         {
+            internalType: "address",
+            name: "",
+            type: "address",
+         },
+      ],
+      stateMutability: "view",
+      type: "function",
+   },
+   {
+      inputs: [],
       name: "getPrice",
       outputs: [
          {
@@ -136,9 +145,5 @@ export const abi = [
       outputs: [],
       stateMutability: "nonpayable",
       type: "function",
-   },
-   {
-      stateMutability: "payable",
-      type: "receive",
    },
 ];

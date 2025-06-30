@@ -81,6 +81,9 @@ contract FundMe {
     // );
 
     function cheaperWithdraw() public onlyOwner {
+        console.log("msg.sender: ", msg.sender);
+        console.log("contract owner: ", i_owner);
+        console.log(" address(this).balance: ", address(this).balance);
         address[] memory funders = s_funders;
         for (uint256 index = 0; index < funders.length; index++) {
             s_fundersWithAmount[funders[index]] = 0; // replacemnt of this line :             address fundKey = funders[index];
@@ -91,6 +94,8 @@ contract FundMe {
         (bool sucess_tranfer, ) = payable(msg.sender).call{
             value: address(this).balance
         }("");
+        console.log(" address(this).balance: ", address(this).balance);
+
         require(sucess_tranfer, "sender call fail - withdraw");
     }
 
@@ -103,12 +108,12 @@ contract FundMe {
         _; // its means first check the condition then run the code  , if we put it above the require statement then it run the code
     }
 
-    receive() external payable {
-        Fund();
-    }
-    fallback() external payable {
-        Fund();
-    }
+    // receive() external payable {
+    //     Fund();
+    // }
+    // fallback() external payable {
+    //     Fund();
+    // }
 
     //-----------
     // Getters
@@ -129,5 +134,8 @@ contract FundMe {
         address funderIndex
     ) public view returns (uint256) {
         return s_fundersWithAmount[funderIndex];
+    }
+    function getOwner() public view returns (address) {
+        return i_owner;
     }
 }
