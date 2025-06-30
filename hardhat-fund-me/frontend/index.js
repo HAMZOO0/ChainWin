@@ -7,7 +7,7 @@ const fundButton = document.getElementById("fundButton");
 const WithdrawButton = document.getElementById("WithdrawButton");
 const getBalanceButton = document.getElementById("GetBalance");
 const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
+const signer = provider.getSigner(); //signer=  Get the currently connected wallet (account) from MetaMask that will sign and send transactions to the blockchain.
 
 connectButton.onclick = connect;
 fundButton.onclick = fund;
@@ -17,6 +17,7 @@ ownerButton.onclick = findContractOwner;
 
 async function connect() {
    if (window.ethereum !== "undefined") {
+      // account have array of metamask accounts and accout[0] is currect account which we are using.
       const account = await window.ethereum.request({
          method: "eth_requestAccounts",
       });
