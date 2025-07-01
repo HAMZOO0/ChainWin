@@ -61,7 +61,7 @@ hardhat-fund-me/
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/HAMZOO0/Blockchain-Project.git
    cd hardhat-fund-me
    ```
 2. Install dependencies:
@@ -113,36 +113,50 @@ You can add your frontend code in the `frontend/` directory. Use JavaScript libr
 
 ## Screenshots
 Below are improved and organized screenshots of the DApp and its features:
+<table>
+  <tr>
+    <td align="center"><b>Main Dashboard</b><br>
+      <img src="image.png" width="850"/>
+    </td>
+    <td align="center"><b>Funding Page</b><br>
+      <img src="image-5.png" width="850"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><b>Transaction Page</b><br>
+      <img src="image-7.png" width="250" height="400"/>
+    </td>
+    <td align="center"><b>Additional UI</b><br>
+      <img src="image-6.png" width= 250" height="400"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><b>Transaction Proof</b><br>
+      <img src="image-1.png" width="850"/>
+    </td>
+    <td align="center"><b>Web View</b><br>
+      <img src="image-2.png" width="850"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><b>Footer</b><br>
+      <img src="image-3.png" width="850"/>
+    </td>
+    <td align="center"><b>Withdraw</b><br>
+      <img src="image-4.png" width="850"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><b>Hardhat Node Transaction</b><br>
+      <img src="image-8.png" width="850" />
+    </td>
+    <td align="center"><b>Unit Test and Gas Report</b><br>
+      <img src="image-9.png" width="850"/>
+    </td>
+  </tr>
+</table>
 
-#### Main Dashboard
-![Main Dashboard](image.png)
 
-#### Funding Page
-![Funding Page](image-5.png)
-
-#### Transaction Page
-![Transaction Page](image-7.png)
-
-#### Transaction Proof
-![Transaction Proof](image-1.png)
-
-#### Web View
-![Web View](image-2.png)
-
-#### Footer
-![Footer](image-3.png)
-
-#### Withdraw
-![Withdraw](image-4.png)
-
-#### Additional UI
-![Additional UI](image-6.png)
-
-#### Hardhat Node Transaction
-![Hardhat Node Transaction](image-8.png)
-
-#### Unit Test and Gas Report
-![Unit Test and Gas Report](image-9.png)
 
 - [Verified Contract on Etherscan](https://sepolia.etherscan.io/address/0xd1ffeCD2602326350298F2CCfd7e5E86D65B4F62#code)
 - [Chainlink Documentation](https://docs.chain.link/)
