@@ -10,16 +10,27 @@ pragma solidity ^0.8.28;
 // import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 // import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
+<<<<<<< HEAD:hardhat-lottery/smart-contracts/contracts/lottery.sol
 // import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 
 error Lottery__NotEnoughETHForEntranceFee();
 
 // inhareting the VRFConsumerBaseV2 class
 contract Lottery is VRFConsumerBaseV2Plus {
+=======
+import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
+
+
+error Lottery__NotEnoughETHForEntranceFee();
+
+// inhareting the VRFConsumerBaseV2 class 
+contract Lottery  is  VRFConsumerBaseV2{
+>>>>>>> 9879acff703e7f04fc5a46663e83bc1195bb6dd1:hardhat-lottery/smart-contracts/contract/lottery.sol
     address payable[] private s_players; // when we find winner then we pay them so it is payable
     uint256 private immutable i_entranceFee;
 
     /* Events */
+<<<<<<< HEAD:hardhat-lottery/smart-contracts/contracts/lottery.sol
     event TicketBought(address indexed player);
 
     /* constructor */
@@ -27,6 +38,12 @@ contract Lottery is VRFConsumerBaseV2Plus {
         uint256 entranceFee,
         address vrfCoordinator
     ) VRFConsumerBaseV2Plus(vrfCoordinator) {
+=======
+    event TicketBought ( address indexed player);
+
+    /* constructor */
+    constructor(uint256 entranceFee , address vrfCoordinator) VRFConsumerBaseV2(vrfCoordinator){
+>>>>>>> 9879acff703e7f04fc5a46663e83bc1195bb6dd1:hardhat-lottery/smart-contracts/contract/lottery.sol
         i_entranceFee = entranceFee;
     }
 
@@ -41,6 +58,7 @@ contract Lottery is VRFConsumerBaseV2Plus {
         }
     }
 
+<<<<<<< HEAD:hardhat-lottery/smart-contracts/contracts/lottery.sol
     /* pickRandomWinner */
 
     function pickRandomWinner() external {
@@ -53,6 +71,20 @@ contract Lottery is VRFConsumerBaseV2Plus {
         uint256 requestId,
         uint256[] calldata randomWords
     ) internal override {}
+=======
+        /* pickRandomWinner */
+
+    function pickRandomWinner() external {
+
+        //reqest the rendom number 
+        // after getting it do some logic on it 
+        // it is based on 2 transection process
+    }
+    /* ] inhareted and overrided the fulfillRandomWords virtual function from VRFConsumerBaseV2  */
+    function fulfillRandomWords(uint256 requestId   uint256[] memory randomWords) internal override {
+        
+    }
+>>>>>>> 9879acff703e7f04fc5a46663e83bc1195bb6dd1:hardhat-lottery/smart-contracts/contract/lottery.sol
     // -------------------
     //  Getters
     // -------------------
