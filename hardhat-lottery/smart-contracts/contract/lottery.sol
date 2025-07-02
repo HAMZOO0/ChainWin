@@ -7,18 +7,25 @@
 // SPDX-License-Identifier:MIT
 pragma solidity ^0.8.28;
 
+// import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+// import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
+import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
+
+
 error Lottery__NotEnoughETHForEntranceFee();
 
-contract Lottery {
+// inhareting the VRFConsumerBaseV2 class 
+contract Lottery  is  VRFConsumerBaseV2{
     address payable[] private s_players; // when we find winner then we pay them so it is payable
     uint256 private immutable i_entranceFee;
 
 
     /* Events */
-    event TicketBought ( address indexed player){}
+    event TicketBought ( address indexed player);
 
     /* constructor */
-    constructor(uint256 entranceFee) {
+    constructor(uint256 entranceFee , address vrfCoordinator) VRFConsumerBaseV2(vrfCoordinator){
         i_entranceFee = entranceFee;
     }
 
@@ -32,8 +39,19 @@ contract Lottery {
             emit TicketBought (msg.sender);
         }
     }
-    function pickRandomWinner() public {}
 
+        /* pickRandomWinner */
+
+    function pickRandomWinner() external {
+
+        //reqest the rendom number 
+        // after getting it do some logic on it 
+        // it is based on 2 transection process
+    }
+    /* ] inhareted and overrided the fulfillRandomWords virtual function from VRFConsumerBaseV2  */
+    function fulfillRandomWords(uint256 requestId   uint256[] memory randomWords) internal override {
+        
+    }
     // -------------------
     //  Getters
     // -------------------
