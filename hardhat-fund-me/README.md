@@ -101,6 +101,22 @@ After deployment, the contract is automatically verified on Etherscan if the API
   npx hardhat test --network sepolia
   ```
 
+## NPM Scripts
+
+The following scripts are available in the `package.json` for managing and testing your smart contracts:
+
+| Script           | Description                                 |
+|------------------|---------------------------------------------|
+| `npm test`       | Run all unit tests with Hardhat              |
+| `npm run test:staging` | Run tests on the Sepolia testnet         |
+| `npm run test:local`   | Run tests on a local Hardhat/localhost node |
+| `npm run coverage`     | Generate a Solidity code coverage report  |
+
+You can run these scripts from the root of your project. For example:
+```bash
+npm run test:staging
+```
+
 ## Interacting with the Contract
 - Get contract address and ABI from Hardhat Deploy:
   ```js
