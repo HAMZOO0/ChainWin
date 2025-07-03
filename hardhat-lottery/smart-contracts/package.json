@@ -3,14 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "compile": "npx hardhat compile",
-  "local deploy": "npx hardhat deploy --network sepolia",
-  "test": "npx hardhat test",
-  "test:staging": "npx hardhat test --network sepolia",
-  "test:local": "npx hardhat test --network localhost",
-  "coverage": "npx hardhat coverage"
-},
-
+    "compile": "npx hardhat compile",
+    "local deploy": "npx hardhat deploy --network sepolia",
+    "test": "npx hardhat test",
+    "test:staging": "npx hardhat test --network sepolia",
+    "test:local": "npx hardhat test --network localhost",
+    "coverage": "npx hardhat coverage"
+  },
   "author": "Hamza Sajid",
   "license": "ISC",
   "description": " this is blockchain lottery project",
