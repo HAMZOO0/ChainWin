@@ -67,7 +67,6 @@ contract Lottery is VRFConsumerBaseV2Plus {
     }
 
     /* requstRandomWinner */
-
     function requstRandomWinner() external {
         //reqest the rendom number
         // after getting it do some logic on it
@@ -99,6 +98,7 @@ contract Lottery is VRFConsumerBaseV2Plus {
         (bool success, ) = winner.call{value: address(this).balance}("");
         require(success, "Transfer failed");
     }
+
     // -------------------
     //  Getters
     // -------------------
