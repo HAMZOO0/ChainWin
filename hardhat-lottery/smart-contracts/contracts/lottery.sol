@@ -19,6 +19,7 @@ error Lottery__NotEnoughETHForEntranceFee();
 contract Lottery is VRFConsumerBaseV2Plus {
     address payable[] private s_players; // when we find winner then we pay them so it is payable
     uint256 private immutable i_entranceFee;
+    // VRFCoordinatorV2PlusInterface public s_vrfCoordinator;
 
     // * Chainlink VRF config
     /// @notice The subscription ID for Chainlink VRF, used to identify the VRF subscription.
@@ -40,7 +41,7 @@ contract Lottery is VRFConsumerBaseV2Plus {
 
     /* Events */
     event TicketBought(address indexed player);
-
+    event RequstLotteryWinner(uint256 indexed requstId); // requst id
     /* constructor */
     constructor(
         uint256 entranceFee,
@@ -65,24 +66,25 @@ contract Lottery is VRFConsumerBaseV2Plus {
         emit TicketBought(msg.sender);
     }
 
-    /* pickRandomWinner */
+    /* requstRandomWinner */
 
-    function pickRandomWinner() external {
+    function requstRandomWinner() external {
         //reqest the rendom number
         // after getting it do some logic on it
         // it is based on 2 transection process
-        s_requestId = s_vrfCoordinator.requestRandomWords(
-            VRFV2PlusClient.RandomWordsRequest({
-                keyHash: i_keyHash,
-                subId: i_subscriptionId,
-                requestConfirmations: REQUEST_CONFIRMATIONS,
-                callbackGasLimit: CALLBACK_GAS_LIMIT,
-                numWords: NUM_WORDS,
-                extraArgs: VRFV2PlusClient._argsToBytes(
-                    VRFV2PlusClient.ExtraArgsV1({nativePayment: true})
-                )
-            })
-        );
+        s_requestId = s_vrfCoordinator.requestRandomWords( // it return requst id  - and it send the requst
+                VRFV2PlusClient.RandomWordsRequest({ // here we are setting up the requst
+                        keyHash: i_keyHash,
+                        subId: i_subscriptionId,
+                        requestConfirmations: REQUEST_CONFIRMATIONS,
+                        callbackGasLimit: CALLBACK_GAS_LIMIT,
+                        numWords: NUM_WORDS,
+                        extraArgs: VRFV2PlusClient._argsToBytes(
+                            VRFV2PlusClient.ExtraArgsV1({nativePayment: true})
+                        )
+                    })
+            );
+        emit RequstLotteryWinner(s_requestId);
     }
 
     /*  inhareted and overrided the fulfillRandomWords virtual function from VRFConsumerBaseV2  */
