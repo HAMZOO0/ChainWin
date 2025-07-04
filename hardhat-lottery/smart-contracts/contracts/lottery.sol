@@ -10,15 +10,23 @@ pragma solidity ^0.8.28;
 /*imports */
 import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
+import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol"; // for chainlink keeper
 
 /*error */
 error Lottery__NotEnoughETHForEntranceFee();
 error WinnerTransferFailed();
 
 // inhareting the VRFConsumerBaseV2 class
-contract Lottery is VRFConsumerBaseV2Plus {
+contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
+    // Type declarations
+    enum LotteryState {
+        OPEN,
+        CALCULATING
+    }
+
     address payable[] private s_players; // when we find winner then we pay them so it is payable
     uint256 private immutable i_entranceFee;
+    LotteryState private s_lotteryState;
     // VRFCoordinatorV2PlusInterface public s_vrfCoordinator;
 
     //* Chainlink VRF config
@@ -39,6 +47,10 @@ contract Lottery is VRFConsumerBaseV2Plus {
     uint256 private s_requestId;
     address private s_recentWinner;
 
+    //* Chainlink Keeper config
+    uint256 private s_lastTimeStamp;
+    uint256 private immutable i_interval;
+
     /* Events */
     event TicketBought(address indexed player);
     event RequstLotteryWinner(uint256 indexed requstId); // requst id
@@ -56,6 +68,11 @@ contract Lottery is VRFConsumerBaseV2Plus {
         i_entranceFee = entranceFee;
         i_subscriptionId = subscriptionId;
         i_keyHash = keyHash;
+
+        // keepers
+        i_interval = 60; // 60 sec
+        s_lastTimeStamp = block.timestamp;
+        s_lotteryState = LotteryState.OPEN;
     }
 
     /* buyTicket */
@@ -68,8 +85,38 @@ contract Lottery is VRFConsumerBaseV2Plus {
         emit TicketBought(msg.sender);
     }
 
-    /* requstRandomWinner */
-    function requstRandomWinner() external {
+    /*
+     *  @dev Chainlink keeper nodes call this off-chain to check if work is needed
+     *  work needed if :  if the timestamp is greater then interval ( 60 sec) && player list is not empty && balance is greater then 0
+     *  lotter is in open state 
+
+     */
+    function checkUpkeep(
+        bytes calldata /*checkData*/
+    )
+        external
+        view
+        override
+        returns (bool upkeepNeeded, bytes memory /* performData */)
+    {
+        bool isTime = (block.timestamp - s_lastTimeStamp) > i_interval;
+        bool hasPlayers = s_players.length > 0;
+        bool hasBalance = address(this).balance > 0;
+
+        upkeepNeeded = isTime && hasPlayers && hasBalance;
+    }
+
+    function performUpkeep(bytes calldata /*performData*/) external override {
+        (bool upkeepNeeded, ) = checkUpkeep("");
+        if (!upkeepNeeded) {
+            revert("Upkeep not needed");
+        }
+        s_lastTimeStamp = block.timestamp; // update the last time stamp ;
+        requestRandomWinner();
+    }
+
+    /* requestRandomWinner */
+    function requestRandomWinner() external {
         //reqest the rendom number
         // after getting it do some logic on it
         // it is based on 2 transection process
@@ -90,7 +137,7 @@ contract Lottery is VRFConsumerBaseV2Plus {
 
     /*  inhareted and overrided the fulfillRandomWords virtual function from VRFConsumerBaseV2  */
     function fulfillRandomWords(
-        uint256,
+        uint256 /*requstId*/,
         uint256[] calldata randomWords
     ) internal override {
         uint256 winnerIndex = randomWords[0] % s_players.length;
