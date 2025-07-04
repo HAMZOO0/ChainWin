@@ -12,8 +12,8 @@ import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFCo
 import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 
 /*error */
-
 error Lottery__NotEnoughETHForEntranceFee();
+error WinnerTransferFailed();
 
 // inhareting the VRFConsumerBaseV2 class
 contract Lottery is VRFConsumerBaseV2Plus {
@@ -21,7 +21,7 @@ contract Lottery is VRFConsumerBaseV2Plus {
     uint256 private immutable i_entranceFee;
     // VRFCoordinatorV2PlusInterface public s_vrfCoordinator;
 
-    // * Chainlink VRF config
+    //* Chainlink VRF config
     /// @notice The subscription ID for Chainlink VRF, used to identify the VRF subscription.
     /// @notice The key hash for Chainlink VRF, used to specify the gas lane for randomness requests.
     /// @notice The gas limit for the callback function when fulfilling randomness, set to 100,000.
@@ -42,6 +42,8 @@ contract Lottery is VRFConsumerBaseV2Plus {
     /* Events */
     event TicketBought(address indexed player);
     event RequstLotteryWinner(uint256 indexed requstId); // requst id
+    event WinnerPicked(address indexed playerIndex);
+
     /* constructor */
     constructor(
         uint256 entranceFee,
@@ -96,7 +98,11 @@ contract Lottery is VRFConsumerBaseV2Plus {
         s_recentWinner = winner;
 
         (bool success, ) = winner.call{value: address(this).balance}("");
-        require(success, "Transfer failed");
+        // require(success, "Winner Transfer Failed ");
+        if (!success) {
+            revert WinnerTransferFailed();
+        }
+        emit WinnerPicked(winner); //?  if it not work then replace with s_recentWinner
     }
 
     // -------------------
@@ -107,5 +113,8 @@ contract Lottery is VRFConsumerBaseV2Plus {
     }
     function getPlayers(uint256 index) public view returns (address) {
         return s_players[index];
+    }
+    function getRecentWinner() public view returns (address) {
+        return s_recentWinner;
     }
 }
