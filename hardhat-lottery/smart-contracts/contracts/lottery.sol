@@ -1,8 +1,8 @@
 /* TODO
- # 1 Buy ticket  (pay some ammount )
+ # 1 Buy ticket  (pay some amount)
  # 2 Pick random player as a winner (verifiable random)
- # 3 Winner selected in x ammount of time  - ( completly automated)
- # 4 Chainlink --> Randomness , Automaed execution - (ChainLink Keeper)
+ # 3 Winner selected in x amount of time  - (completely automated)
+ # 4 Chainlink --> Randomness, Automated execution - (ChainLink Keeper)
  */
 
 // SPDX-License-Identifier:MIT
@@ -15,8 +15,16 @@ import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/autom
 
 /*error */
 error Lottery__NotEnoughETHForEntranceFee();
-error WinnerTransferFailed();
+error Lottery__WinnerTransferFailed();
 error Lottery__NotOpen();
+error Lottery__UpkeepNotNeeded();
+
+/*
+ * @title    A lottery smart contract
+ * @author   Hamza Sajid
+ * @notice   Creating a lottery system which is totally automated, decentralized, and untamperable.
+ * @dev      Uses Chainlink VRF for randomness and Chainlink Keeper for automation.
+ */
 
 // inhareting the VRFConsumerBaseV2 class
 contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
@@ -26,18 +34,18 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         CALCULATING
     }
 
-    address payable[] private s_players; // when we find winner then we pay them so it is payable
-    uint256 private immutable i_entranceFee;
-    LotteryState private s_lotteryState;
+    /*
+     *Chainlink VRF config
+     * @notice The subscription ID for Chainlink VRF, used to identify the VRF subscription.
+     * @notice The key hash for Chainlink VRF, used to specify the gas lane for randomness requests.
+     * @notice The gas limit for the callback function when fulfilling randomness, set to 100,000.
+     * @notice The number of block confirmations required before the VRF response is considered valid.
+     * @notice The number of random words to request from Chainlink VRF, set to 1 for a single winner.
+     * @notice Stores the most recent VRF request ID for tracking randomness requests.
 
-    //* Chainlink VRF config
-    /// @notice The subscription ID for Chainlink VRF, used to identify the VRF subscription.
-    /// @notice The key hash for Chainlink VRF, used to specify the gas lane for randomness requests.
-    /// @notice The gas limit for the callback function when fulfilling randomness, set to 100,000.
-    /// @notice The number of block confirmations required before the VRF response is considered valid.
-    /// @notice The number of random words to request from Chainlink VRF, set to 1 for a single winner.
-    /// @notice Stores the most recent VRF request ID for tracking randomness requests.
-    /// @notice Stores the address of the most recent lottery winner.
+     * @notice Stores the address of the most recent lottery winner.
+     
+     */
 
     uint64 private immutable i_subscriptionId; // after subscription ,subscription id will genrate
     bytes32 private immutable i_keyHash; // also find under the address of sepolia vrf
@@ -47,6 +55,10 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
     uint256 private s_requestId;
     address private s_recentWinner;
+
+    address payable[] private s_players; // when we find winner then we pay them so it is payable
+    uint256 private immutable i_entranceFee;
+    LotteryState private s_lotteryState;
 
     //* Chainlink Keeper config
     uint256 private s_lastTimeStamp;
@@ -89,37 +101,8 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         emit TicketBought(msg.sender);
     }
 
-    /*
-     *  @dev Chainlink keeper nodes call this off-chain to check if work is needed
-     *  work needed if :  if the timestamp is greater then interval ( 60 sec) && player list is not empty && balance is greater then 0
-     *  lotter is in open state
-     */
-    function checkUpkeep(
-        bytes calldata /*checkData*/
-    )
-        external
-        view
-        override
-        returns (bool upkeepNeeded, bytes memory /* performData */)
-    {
-        bool isTime = (block.timestamp - s_lastTimeStamp) > i_interval;
-        bool hasPlayers = s_players.length > 0;
-        bool hasBalance = address(this).balance > 0;
-
-        upkeepNeeded = isTime && hasPlayers && hasBalance;
-    }
-
-    function performUpkeep(bytes calldata /*performData*/) external override {
-        (bool upkeepNeeded, ) = checkUpkeep("");
-        if (!upkeepNeeded) {
-            revert("Upkeep not needed");
-        }
-        s_lastTimeStamp = block.timestamp; // update the last time stamp ;
-        requestRandomWinner();
-    }
-
     /* requestRandomWinner */
-    function requestRandomWinner() external {
+    function requestRandomWinner() public {
         // Request randomness and wait for callback
 
         s_lotteryState = LotteryState.CALCULATING; // here our state change and it open after fulfillRandomWords
@@ -149,12 +132,48 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         s_recentWinner = winner;
 
         s_lotteryState = LotteryState.OPEN;
+        delete s_players;
+
         (bool success, ) = winner.call{value: address(this).balance}("");
         // require(success, "Winner Transfer Failed ");
         if (!success) {
-            revert WinnerTransferFailed();
+            revert Lottery__WinnerTransferFailed();
         }
         emit WinnerPicked(winner); //?  if it not work then replace with s_recentWinner
+    }
+
+    /*
+     *  @dev Chainlink keeper nodes call this off-chain to check if work is needed
+     * they look for `upkeepNeeded` to return True.
+     * the following should be true for this to return true:
+     * 1. The time interval has passed between raffle runs.
+     * 2. The lottery is open.
+     * 3. The contract has ETH.
+     * 4. Implicity, your subscription is funded with LINK.
+     */
+    function checkUpkeep(
+        bytes memory /*checkData*/
+    )
+        public
+        view
+        override
+        returns (bool upkeepNeeded, bytes memory /* performData */)
+    {
+        bool isTime = (block.timestamp - s_lastTimeStamp) > i_interval;
+        bool hasPlayers = s_players.length > 0;
+        bool hasBalance = address(this).balance > 0;
+        bool isOpen = s_lotteryState == LotteryState.OPEN;
+
+        upkeepNeeded = isTime && hasPlayers && hasBalance && isOpen;
+    }
+
+    function performUpkeep(bytes calldata /*performData*/) external override {
+        (bool upkeepNeeded, ) = checkUpkeep("");
+        if (!upkeepNeeded) {
+            revert Lottery__UpkeepNotNeeded;
+        }
+        s_lastTimeStamp = block.timestamp; // update the last time stamp ;
+        requestRandomWinner();
     }
 
     // -------------------
