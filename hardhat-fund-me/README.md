@@ -178,6 +178,16 @@ Below are improved and organized screenshots of the DApp and its features:
 - [Chainlink Documentation](https://docs.chain.link/)
 - [Hardhat Documentation](https://hardhat.org/docs)
 
+## 🛠️ How Deployment Scripts Work (Key Points)
+
+- **Deployment scripts are not stored on the blockchain.** They are JavaScript files that run on your computer to deploy contracts.
+- **They run only when you deploy.** For example, when you run `npx hardhat deploy` or `npx hardhat test`, the scripts execute to set up your contracts.
+- **Network-aware logic:** The script checks which network you are deploying to (local, testnet, mainnet) and makes decisions accordingly.
+- **Mocks for local testing:** On local networks (like Hardhat/localhost), the script deploys a mock price feed and connects your contract to it.
+- **Real addresses for testnet/mainnet:** On public networks, the script uses the real Chainlink price feed address.
+- **One-time setup:** After deployment, the script does not run again unless you redeploy. The contracts live on the blockchain and are independent of the script.
+- **Automated for tests:** When you run tests, Hardhat runs the deployment scripts first so your contracts are ready for testing.
+
 ---
 
 Feel free to contribute or open issues for improvements!
