@@ -1,8 +1,9 @@
-// Raffle
-// # 1 Buy ticket  (pay some ammount )
-// # 2 Pick random player as a winner (verifiable random)
-// # 3 Winner selected in x ammount of time  - ( completly automated)
-// # 4 Chainlink --> Randomness , Automaed execution - (ChainLink Keeper)
+/* TODO
+ # 1 Buy ticket  (pay some ammount )
+ # 2 Pick random player as a winner (verifiable random)
+ # 3 Winner selected in x ammount of time  - ( completly automated)
+ # 4 Chainlink --> Randomness , Automaed execution - (ChainLink Keeper)
+ */
 
 // SPDX-License-Identifier:MIT
 pragma solidity ^0.8.28;
@@ -15,6 +16,7 @@ import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/autom
 /*error */
 error Lottery__NotEnoughETHForEntranceFee();
 error WinnerTransferFailed();
+error Lottery__NotOpen();
 
 // inhareting the VRFConsumerBaseV2 class
 contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
@@ -27,7 +29,6 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     address payable[] private s_players; // when we find winner then we pay them so it is payable
     uint256 private immutable i_entranceFee;
     LotteryState private s_lotteryState;
-    // VRFCoordinatorV2PlusInterface public s_vrfCoordinator;
 
     //* Chainlink VRF config
     /// @notice The subscription ID for Chainlink VRF, used to identify the VRF subscription.
@@ -53,7 +54,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
     /* Events */
     event TicketBought(address indexed player);
-    event RequstLotteryWinner(uint256 indexed requstId); // requst id
+    event RequestLotteryWinner(uint256 indexed requestId); // request id
     event WinnerPicked(address indexed playerIndex);
 
     /* constructor */
@@ -77,9 +78,12 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
     /* buyTicket */
     function buyTicket() public payable {
-        // msg.value < i_entranceFee | if sender have not enough eth so it cause error message
+        // Revert if not enough ETH sent for player
         if (msg.value < i_entranceFee) {
             revert Lottery__NotEnoughETHForEntranceFee();
+        }
+        if (s_lotteryState != LotteryState.OPEN) {
+            revert Lottery__NotOpen();
         }
         s_players.push(payable(msg.sender));
         emit TicketBought(msg.sender);
@@ -88,8 +92,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     /*
      *  @dev Chainlink keeper nodes call this off-chain to check if work is needed
      *  work needed if :  if the timestamp is greater then interval ( 60 sec) && player list is not empty && balance is greater then 0
-     *  lotter is in open state 
-
+     *  lotter is in open state
      */
     function checkUpkeep(
         bytes calldata /*checkData*/
@@ -117,9 +120,10 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
     /* requestRandomWinner */
     function requestRandomWinner() external {
-        //reqest the rendom number
-        // after getting it do some logic on it
-        // it is based on 2 transection process
+        // Request randomness and wait for callback
+
+        s_lotteryState = LotteryState.CALCULATING; // here our state change and it open after fulfillRandomWords
+
         s_requestId = s_vrfCoordinator.requestRandomWords( // it return requst id  - and it send the requst
                 VRFV2PlusClient.RandomWordsRequest({ // here we are setting up the requst
                         keyHash: i_keyHash,
@@ -132,7 +136,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
                         )
                     })
             );
-        emit RequstLotteryWinner(s_requestId);
+        emit RequestLotteryWinner(s_requestId);
     }
 
     /*  inhareted and overrided the fulfillRandomWords virtual function from VRFConsumerBaseV2  */
@@ -144,6 +148,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         address payable winner = s_players[winnerIndex];
         s_recentWinner = winner;
 
+        s_lotteryState = LotteryState.OPEN;
         (bool success, ) = winner.call{value: address(this).balance}("");
         // require(success, "Winner Transfer Failed ");
         if (!success) {
