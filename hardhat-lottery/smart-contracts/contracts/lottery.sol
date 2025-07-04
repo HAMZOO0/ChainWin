@@ -44,7 +44,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
      * @notice Stores the most recent VRF request ID for tracking randomness requests.
 
      * @notice Stores the address of the most recent lottery winner.
-     
+
      */
 
     uint64 private immutable i_subscriptionId; // after subscription ,subscription id will genrate
@@ -170,7 +170,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     function performUpkeep(bytes calldata /*performData*/) external override {
         (bool upkeepNeeded, ) = checkUpkeep("");
         if (!upkeepNeeded) {
-            revert Lottery__UpkeepNotNeeded;
+            revert Lottery__UpkeepNotNeeded();
         }
         s_lastTimeStamp = block.timestamp; // update the last time stamp ;
         requestRandomWinner();
@@ -187,5 +187,23 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     }
     function getRecentWinner() public view returns (address) {
         return s_recentWinner;
+    }
+    function getLotteryState() public view returns (LotteryState) {
+        return s_lotteryState;
+    }
+    // NUM_WORDS is constant so we are fetching it form abi not from storage so we use pure not view :)
+    function getNumWords() public pure returns (uint32) {
+        return NUM_WORDS;
+    }
+
+    function getNumberOfPlayers() public view returns (uint256) {
+        return s_players.length;
+    }
+
+    function getLastestTimeStamp() public view returns (uint256) {
+        return s_lastTimeStamp;
+    }
+    function getRequestConfirmation() public pure returns (uint16){
+        return REQUEST_CONFIRMATIONS;
     }
 }
