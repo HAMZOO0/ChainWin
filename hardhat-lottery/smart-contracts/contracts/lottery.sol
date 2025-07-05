@@ -204,6 +204,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     function getLastestTimeStamp() public view returns (uint256) {
         return s_lastTimeStamp;
     }
+
     function getRequestConfirmation() public pure returns (uint16) {
         return REQUEST_CONFIRMATIONS;
     }
