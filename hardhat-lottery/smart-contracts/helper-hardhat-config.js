@@ -1,6 +1,6 @@
 const networkConfig = {
    sepolia: {
-      vrfCoordinator: "0x5ce8d5a2bc84beb22a398cca51996f7930313d61",
+      vrfCoordinator: "0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B",
    },
 };
 
