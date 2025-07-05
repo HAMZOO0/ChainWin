@@ -1,10 +1,12 @@
 const { network } = require("hardhat");
-const { developmentChains } = require("../helper-hardhat-config.js");
+const {
+   developmentChains,
+   networkConfig,
+} = require("../helper-hardhat-config.js");
 const { verify } = require("../utils/verify.js");
 require("dotenv").config();
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
-
    const { log, deploy } = deployments;
 
    const { deployer } = await getNamedAccounts();
@@ -13,7 +15,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       from: deployer,
       arg: [],
       log: true,
-      waitConfirmations: 1,
+      waitConfirmations: network.config.blockConfirmation || 1,
    });
-}
+};
 module.exports.tags = [];
