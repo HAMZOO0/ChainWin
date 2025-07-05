@@ -39,7 +39,7 @@ module.exports = {
          deployer: {
             default: 0,
          },
-         user: {
+         player: {
             default: 1,
          },
       },
