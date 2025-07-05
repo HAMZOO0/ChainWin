@@ -6,11 +6,9 @@ const {
 const { verify } = require("../utils/verify.js");
 require("dotenv").config();
 
-//  constructor(uint96 _baseFee, uint96 _gasPriceLink) ConfirmedOwner(msg.sender) {
 const BASE_FEE = ethers.utils.parseEther("0.24"); //It's the flat LINK fee for every VRF request. This is charged no matter what.
-// BASE_FEE + (GAS_USED × GAS_PRICE_LINK)
 const GAS_PRICE_LINK = 1e9;
-// Total Fee = BASE_FEE + (gasUsed × GAS_PRICE_LINK)
+//? Total Fee = (BASE_FEE + GAS_USED × GAS_PRICE_LINK) × (1 + Premium %)
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
    const { log, deploy } = deployments;
@@ -21,22 +19,17 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       log(`${network.name} Local Network Detected So We Use Mock Contract`);
 
       // deploying a  MockV3Aggregator
-      const MockV3Aggregator = await deploy("MockV3Aggregator", {
+      const MockV3Aggregator = await deploy("VRFCoordinatorV2Mock", {
          arg: [BASE_FEE, GAS_PRICE_LINK],
          log: true,
          waitConfirmations: network.config.blockConfirmation || 1,
       });
+      log("VRFCoordinatorV2Mock is  Deployed !");
+      log("----------------------------------------------------");
    }
-
-   // const Lottery = await deploy("Lottery", {
-   //    from: deployer,
-   //    arg: [],
-   //    log: true,
-   //    waitConfirmations: network.config.blockConfirmation || 1,
-   // });
 };
 
-module.exports.tags = [];
+module.exports.tags = ["All", "mock", "local"];
 
 // | Item             | Value                             |
 // | ---------------- | --------------------------------- |

@@ -20,7 +20,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
    if (developmentChains.includes(network.name)) {
       // Get address of mock contract deployed locally
-      const mockContract = await deployments.get("MockV3Aggregator");
+      const mockContract = await get("MockV3Aggregator");
       ethUsdPriceFeedAddress = mockContract.address;
    }
    //  Real Chainlink price feed on Sepolia
