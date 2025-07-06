@@ -33,5 +33,8 @@
     "prettier-plugin-solidity": "^2.0.0",
     "solhint": "^5.2.0",
     "solidity-coverage": "^0.8.16"
+  },
+  "dependencies": {
+    "chai-as-promised": "^8.0.1"
   }
 }

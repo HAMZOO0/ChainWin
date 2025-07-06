@@ -66,4 +66,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
    }
    log("------------------------------------------");
 };
-module.exports.tags = ["Sepolia", "all"];
+module.exports.tags = ["Sepolia", "All"];
