@@ -44,4 +44,13 @@ const { expect } = chai;
               expect(state.toString()).to.equal("0");
            });
         });
+        describe("Lottery Ticket purchase ", () => {
+           it("Should fail if not enough ETH is sent", async () => {
+              await expect(
+                 Lottery.connect(signer).buyTicket({
+                    value: ethers.utils.parseEther("0.001"),
+                 })
+              ).to.be.rejectedWith("Not Enough ETH For Entrance Fee");
+           });
+        });
      });

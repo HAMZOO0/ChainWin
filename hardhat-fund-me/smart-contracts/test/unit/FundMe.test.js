@@ -193,7 +193,7 @@ const { developmentChains } = require("../../helper-hardhat-config");
               expect(fundersLength.toNumber()).to.equal(0);
            });
 
-           it("Should allow aonly owner to withdraw ", async () => {
+           it("Should allow only owner to withdraw ", async () => {
               const accounts = await ethers.getSigners();
               const attacker = accounts[1]; // this is not owner
               const attackerConnected = await FundMe.connect(attacker);
