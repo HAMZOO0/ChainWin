@@ -31,29 +31,30 @@ module.exports = {
       // paths: {
       //    sources: "./abc", // <-- your current folder
       // },
+   },
+   etherscan: {
+      apiKey: process.env.ETHERSCAN_API_KEY,
+   },
 
-      etherscan: {
-         apiKey: process.env.ETHERSCAN_API_KEY,
+   namedAccounts: {
+      deployer: {
+         default: 0,
       },
-      namedAccounts: {
-         deployer: {
-            default: 0,
-         },
-         player: {
-            default: 1,
-         },
+      player: {
+         default: 1,
       },
-      gasReporter: {
-         enabled: true,
-         currency: "USD",
-         coinmarketcap: process.env.COINMARKETCAP_API_KEY,
-         token: "ETH",
-         // offline: true,
-         gasPrice: 0.000029218760090611, // ← simulate realistic price (in Gwei)
-         // showTimeSpent: true,
-         // noColors: true,
-         // currencyDisplayPrecision: 8, // ← force display of small USD costs
-         // noColors: true,
-      },
+   },
+
+   gasReporter: {
+      enabled: true,
+      currency: "USD",
+      coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+      token: "ETH",
+      // offline: true,
+      gasPrice: 0.000029218760090611, // ← simulate realistic price (in Gwei)
+      // showTimeSpent: true,
+      // noColors: true,
+      // currencyDisplayPrecision: 8, // ← force display of small USD costs
+      // noColors: true,
    },
 };

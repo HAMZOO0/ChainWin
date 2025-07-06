@@ -47,7 +47,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
      */
 
-    uint64 private immutable i_subscriptionId; // after subscription ,subscription id will genrate
+    uint256 private immutable i_subscriptionId; // after subscription ,subscription id will genrate
     bytes32 private immutable i_keyHash; // also find under the address of sepolia vrf
     uint32 private immutable i_callbackGasLimit;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
@@ -73,7 +73,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     constructor(
         address vrfCoordinator,
         uint256 entranceFee,
-        uint64 subscriptionId,
+        uint256 subscriptionId,
         bytes32 keyHash,
         uint32 callBackGasLimit
     )

@@ -15,14 +15,19 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
    if (developmentChains.includes(network.name)) {
       //Mock
-      const vrfCoordinatorMock = await get("VRFCoordinatorV2Mock");
+      const vrfCoordinatorDeployment = await get("VRFCoordinatorV2Mock");
+      const vrfCoordinatorMock = await ethers.getContractAt(
+         "VRFCoordinatorV2Mock",
+         vrfCoordinatorDeployment.address
+      );
+
       vrfCoordinator = vrfCoordinatorMock.address;
 
       //Create Subscription Automatically
       const tx = await vrfCoordinatorMock.createSubscription();
       const txRecipt = await tx.wait(1);
-      subscriptionId = txRecipt.event[0].arg.subId;
-
+      subscriptionId = txRecipt.events[0].args.subId;
+      // subscriptionId = txRecipt.events[0].args.subId.toNumber();
       //Fund it with LINK (Mock uses ETH)
       await vrfCoordinatorMock.fundSubscription(
          subscriptionId,
@@ -39,8 +44,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
    const entranceFee = networkConfig[networkName].entranceFee;
    const keyHash = networkConfig[networkName].keyHash;
+   console.log("Deploying with keyHash:", keyHash);
    const gasLimit = networkConfig[networkName].callbackGasLimit;
-   const arg = [vrfCoordinator, entranceFee, keyHash, subscriptionId, gasLimit];
+   const arg = [vrfCoordinator, entranceFee, subscriptionId, keyHash, gasLimit];
    const Lottery = await deploy("Lottery", {
       from: deployer,
       args: arg,
@@ -60,4 +66,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
    }
    log("------------------------------------------");
 };
-module.exports.tags = [];
+module.exports.tags = ["Sepolia", "all"];

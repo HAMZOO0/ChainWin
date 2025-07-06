@@ -3,7 +3,6 @@ const {
    developmentChains,
    networkConfig,
 } = require("../helper-hardhat-config.js");
-const { verify } = require("../utils/verify.js");
 require("dotenv").config();
 
 const BASE_FEE = ethers.utils.parseEther("0.24"); //It's the flat LINK fee for every VRF request. This is charged no matter what.
@@ -20,7 +19,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
       // deploying a MockV3Aggregator
       const MockV3Aggregator = await deploy("VRFCoordinatorV2Mock", {
-         arg: [BASE_FEE, GAS_PRICE_LINK],
+         from: deployer,
+         args: [BASE_FEE, GAS_PRICE_LINK],
          log: true,
          waitConfirmations: network.config.blockConfirmation || 1,
       });
