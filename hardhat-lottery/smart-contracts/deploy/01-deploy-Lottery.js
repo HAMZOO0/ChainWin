@@ -3,7 +3,7 @@ const {
    developmentChains,
    networkConfig,
 } = require("../helper-hardhat-config.js");
-const { verify } = require("../utils/verify.js");
+const { verify } = require("../utils/verify.util.js");
 require("dotenv").config();
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
@@ -47,5 +47,17 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       log: true,
       waitConfirmations: network.config.blockConfirmation || 1,
    });
+
+   // Verify
+   if (
+      !developmentChains.includes(network.name) &&
+      process.env.ETHERSCAN_API_KEY
+   ) {
+      log("Verifying .....");
+
+      await verify(Lottery.address, arg);
+      log("Verification Done ");
+   }
+   log("------------------------------------------");
 };
 module.exports.tags = [];
