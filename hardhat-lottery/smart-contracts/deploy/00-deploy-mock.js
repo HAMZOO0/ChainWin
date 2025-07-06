@@ -18,13 +18,13 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
    if (developmentChains.includes(network.name)) {
       log(`${network.name} Local Network Detected So We Use Mock Contract`);
 
-      // deploying a  MockV3Aggregator
+      // deploying a MockV3Aggregator
       const MockV3Aggregator = await deploy("VRFCoordinatorV2Mock", {
          arg: [BASE_FEE, GAS_PRICE_LINK],
          log: true,
          waitConfirmations: network.config.blockConfirmation || 1,
       });
-      log("VRFCoordinatorV2Mock is  Deployed !");
+      log("VRFCoordinatorV2Mock is Deployed !");
       log("----------------------------------------------------");
    }
 };

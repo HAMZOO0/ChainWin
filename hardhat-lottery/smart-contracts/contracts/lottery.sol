@@ -49,7 +49,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
     uint64 private immutable i_subscriptionId; // after subscription ,subscription id will genrate
     bytes32 private immutable i_keyHash; // also find under the address of sepolia vrf
-    uint32 private constant CALLBACK_GAS_LIMIT = 100000;
+    uint32 private immutable i_callbackGasLimit;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
     uint32 private constant NUM_WORDS = 1;
 
@@ -74,17 +74,19 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         address vrfCoordinator,
         uint256 entranceFee,
         uint64 subscriptionId,
-        bytes32 keyHash
+        bytes32 keyHash,
+        uint32 callBackGasLimit
     )
         VRFConsumerBaseV2Plus(vrfCoordinator) // address of sepolia vrf
     {
         i_entranceFee = entranceFee;
         i_subscriptionId = subscriptionId;
         i_keyHash = keyHash;
+        i_callbackGasLimit = callBackGasLimit;
         //!  i_gasLane = gasLane;
 
         // keepers
-        i_interval = 60; // 60 sec
+        i_interval = 30; // 30 sec
         s_lastTimeStamp = block.timestamp;
         s_lotteryState = LotteryState.OPEN;
     }
@@ -113,7 +115,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
                         keyHash: i_keyHash,
                         subId: i_subscriptionId,
                         requestConfirmations: REQUEST_CONFIRMATIONS,
-                        callbackGasLimit: CALLBACK_GAS_LIMIT,
+                        callbackGasLimit: i_callbackGasLimit,
                         numWords: NUM_WORDS,
                         extraArgs: VRFV2PlusClient._argsToBytes(
                             VRFV2PlusClient.ExtraArgsV1({nativePayment: true})
