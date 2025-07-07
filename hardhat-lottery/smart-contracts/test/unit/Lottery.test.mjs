@@ -88,14 +88,54 @@ const { expect } = chai;
            });
         });
         describe("checkUpkeep", () => {
-           it("checkUpkeep will have all conditions true", async () => {
+           it("Should return false because balance = 0", async () => {
               //bool isTime = (block.timestamp - s_lastTimeStamp) > i_interval; to make this condition true we need to pass  31s to store new time stamp
               await network.provider.send("evm_increaseTime", [31]);
               await network.provider.request({
                  method: "evm_mine",
                  params: [],
               });
+              //callStatic simulate the function don't change or perform any transection
               const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
+              console.log("upkeepNeeded :: ", upkeepNeeded);
+
+              expect(!upkeepNeeded);
+           });
+
+           it("Should return False if Lottery is Closed State", async () => {
+              // send true
+              await Lottery.buyTicket({ value: sendValue });
+              // time stamp true
+              await network.provider.send("evm_increaseTime", [31]);
+              await network.provider.request({
+                 method: "evm_mine",
+                 params: [],
+              });
+
+              //set to closed state of lottery
+              await Lottery.test_setStateToCalculating();
+              // upkeepNeeded returns false
+              const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
+              console.log("upkeepNeeded :: ", upkeepNeeded);
+
+              expect(!upkeepNeeded);
+           });
+
+           it("Should return True After sending Transection", async () => {
+              //send true
+              await Lottery.buyTicket({ value: sendValue });
+
+              // time stamp true
+              await network.provider.send("evm_increaseTime", [31]);
+              await network.provider.request({
+                 method: "evm_mine",
+                 params: [],
+              });
+
+              //callStatic simulate the function don't change or perform any transection
+              const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
+              console.log("upkeepNeeded :: ", upkeepNeeded);
+
               expect(upkeepNeeded);
            });
         });

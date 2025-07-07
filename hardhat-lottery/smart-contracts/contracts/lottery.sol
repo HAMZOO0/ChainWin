@@ -9,6 +9,7 @@
 pragma solidity ^0.8.28;
 
 /*imports */
+import "hardhat/console.sol"; // testing logs
 import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol"; // for chainlink keeper
@@ -157,7 +158,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
      * 3. The contract has ETH.
      * 4. Implicity, your subscription is funded with LINK.
      */
-        \function checkUpkeep(
+    function checkUpkeep(
         bytes memory /*checkData*/
     )
         public
@@ -169,7 +170,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         bool hasPlayers = s_players.length > 0;
         bool hasBalance = address(this).balance > 0;
         bool isOpen = s_lotteryState == LotteryState.OPEN;
-
+        // console.log("current balance :: ", address(this).balance);
         upkeepNeeded = isTime && hasPlayers && hasBalance && isOpen;
     }
 

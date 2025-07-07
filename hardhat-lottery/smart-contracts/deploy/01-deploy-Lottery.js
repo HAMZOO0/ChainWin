@@ -44,7 +44,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
    const entranceFee = networkConfig[networkName].entranceFee;
    const keyHash = networkConfig[networkName].keyHash;
-   console.log("Deploying with keyHash:", keyHash);
+   // console.log("Deploying with keyHash:", keyHash);
    const gasLimit = networkConfig[networkName].callbackGasLimit;
    const arg = [vrfCoordinator, entranceFee, subscriptionId, keyHash, gasLimit];
    const Lottery = await deploy("Lottery", {
