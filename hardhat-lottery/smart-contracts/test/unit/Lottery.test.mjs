@@ -3,6 +3,7 @@ const { deployments, ethers, getNamedAccounts, network } = hardhat;
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { developmentChains } from "../../helper-hardhat-config.js";
+import "@nomicfoundation/hardhat-chai-matchers";
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -11,6 +12,8 @@ const { expect } = chai;
    ? describe.skip
    : describe("Lottery Testing ...", () => {
         let Lottery, VRFCoordinatorV2Mock, signer;
+        const sendValue = ethers.utils.parseEther("0.1"); // 1 ETH
+
         beforeEach(async () => {
            // get signer
            const { deploy } = await getNamedAccounts();
@@ -46,11 +49,42 @@ const { expect } = chai;
         });
         describe("Lottery Ticket purchase ", () => {
            it("Should fail if not enough ETH is sent", async () => {
-              await expect(
-                 Lottery.connect(signer).buyTicket({
-                    value: ethers.utils.parseEther("0.001"),
-                 })
-              ).to.be.rejectedWith("Not Enough ETH For Entrance Fee");
+              await expect(Lottery.buyTicket()).to.be.rejected;
+           });
+
+           it("Should record when player buy the ticket ", async () => {
+              // 1 : we need to but ticket
+              await Lottery.buyTicket({ value: sendValue });
+              const buyer = await Lottery.getPlayers(0);
+
+              expect(buyer).to.equal(signer.address);
+           });
+
+           it("Should emit event when we but the ticket", async () => {
+              expect(await Lottery.buyTicket({ value: sendValue })).to.emit(
+                 Lottery,
+                 "TicketBought"
+              );
+           });
+           it("Should emit event when we but the ticket", async () => {
+              expect(await Lottery.buyTicket({ value: sendValue })).to.emit(
+                 Lottery,
+                 "TicketBought"
+              );
+           });
+
+           it("if lottry state is close then player can't purchase the ticket", async () => {
+              //   await network.provider.send("evm_increaseTime", [
+              //      interval.toNumber() + 1,
+              //   ]);
+              //   await network.provider.request({
+              //      method: "evm_mine",
+              //      params: [],
+              //   });
+
+              await Lottery.test_setStateToCalculating(); // change the state manually
+              await expect(Lottery.buyTicket({ value: sendValue })).to.be
+                 .rejected;
            });
         });
      });

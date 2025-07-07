@@ -14,7 +14,7 @@ import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/V
 import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol"; // for chainlink keeper
 
 /*error */
-// error Lottery__NotEnoughETHForEntranceFee();
+error Lottery__NotEnoughETHForEntranceFee();
 error Lottery__WinnerTransferFailed();
 error Lottery__NotOpen();
 error Lottery__UpkeepNotNeeded();
@@ -94,15 +94,16 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     /* buyTicket */
     function buyTicket() public payable {
         // Revert if not enough ETH sent for player
-        // if (msg.value < i_entranceFee) {
-        //     revert Lottery__NotEnoughETHForEntranceFee();
-        // }
-        require(msg.value > i_entranceFee, "Not Enough ETH For Entrance Fee");
+        if (msg.value < i_entranceFee) {
+            revert Lottery__NotEnoughETHForEntranceFee();
+        }
+        // require(msg.value > i_entranceFee, "Not Enough ETH For Entrance Fee");
 
         if (s_lotteryState != LotteryState.OPEN) {
             revert Lottery__NotOpen();
         }
         s_players.push(payable(msg.sender));
+
         emit TicketBought(msg.sender);
     }
 
@@ -211,5 +212,8 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
     function getRequestConfirmation() public pure returns (uint16) {
         return REQUEST_CONFIRMATIONS;
+    }
+    function test_setStateToCalculating() public {
+        s_lotteryState = LotteryState.CALCULATING;
     }
 }
