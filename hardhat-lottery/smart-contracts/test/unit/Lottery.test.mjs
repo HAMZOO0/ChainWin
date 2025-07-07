@@ -87,4 +87,16 @@ const { expect } = chai;
                  .rejected;
            });
         });
+        describe("checkUpkeep", () => {
+           it("checkUpkeep will have all conditions true", async () => {
+              //bool isTime = (block.timestamp - s_lastTimeStamp) > i_interval; to make this condition true we need to pass  31s to store new time stamp
+              await network.provider.send("evm_increaseTime", [31]);
+              await network.provider.request({
+                 method: "evm_mine",
+                 params: [],
+              });
+              const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
+              expect(upkeepNeeded);
+           });
+        });
      });
