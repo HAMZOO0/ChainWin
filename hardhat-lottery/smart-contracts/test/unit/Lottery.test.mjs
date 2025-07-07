@@ -139,4 +139,26 @@ const { expect } = chai;
               expect(upkeepNeeded);
            });
         });
+        describe("performUpkeep", () => {
+           //* setting the checkUpkeep true to run the performUpkeep function
+
+           it("Should only run when checkUpkeep is true ", async () => {
+              await Lottery.buyTicket({ value: sendValue });
+
+              await network.provider.send("evm_increaseTime", [31]);
+              await network.provider.request({
+                 method: "evm_mine",
+                 params: [],
+              });
+
+              //callStatic simulate the function don't change or perform any transection
+              const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
+              console.log("upkeepNeeded :: inthe perfm ke", upkeepNeeded);
+              const tx = await Lottery.performUpkeep;
+              [];
+              console.log("tx", tx);
+
+              expect(tx);
+           });
+        });
      });
