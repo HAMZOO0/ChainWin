@@ -58,6 +58,6 @@ module.exports = {
       // noColors: true,
    },
    mocha: {
-      setTimeout: 40000, //   40  sec
+      setTimeout: 200000, //   200  sec
    },
 };

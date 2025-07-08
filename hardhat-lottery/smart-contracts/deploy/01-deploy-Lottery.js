@@ -1,8 +1,5 @@
 const { network, ethers } = require("hardhat");
-const {
-   developmentChains,
-   networkConfig,
-} = require("../helper-hardhat-config.js");
+const { developmentChains, networkConfig } = require("../helper-hardhat-config.js");
 const { verify } = require("../utils/verify.util.js");
 require("dotenv").config();
 
@@ -16,10 +13,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
    if (developmentChains.includes(network.name)) {
       //Mock
       const vrfCoordinatorDeployment = await get("VRFCoordinatorV2_5Mock");
-      const vrfCoordinatorMock = await ethers.getContractAt(
-         "VRFCoordinatorV2_5Mock",
-         vrfCoordinatorDeployment.address
-      );
+      const vrfCoordinatorMock = await ethers.getContractAt("VRFCoordinatorV2_5Mock", vrfCoordinatorDeployment.address);
 
       // setting vrfCoordinator - constructor argument
       vrfCoordinatorAddress = vrfCoordinatorMock.address;
@@ -31,10 +25,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       // subscriptionId = txRecipt.events[0].args.subId.toNumber();
 
       //Fund it with LINK (Mock uses ETH)
-      await vrfCoordinatorMock.fundSubscription(
-         subscriptionId,
-         ethers.utils.parseEther("10")
-      );
+      await vrfCoordinatorMock.fundSubscription(subscriptionId, ethers.utils.parseEther("10"));
 
       // Add Lottery contract as consumer to the subscription
    } else {
@@ -50,13 +41,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
    const keyHash = networkConfig[networkName].keyHash;
    // console.log("Deploying with keyHash:", keyHash);
    const gasLimit = networkConfig[networkName].callbackGasLimit;
-   const arg = [
-      vrfCoordinatorAddress,
-      entranceFee,
-      subscriptionId,
-      keyHash,
-      gasLimit,
-   ];
+   const arg = [vrfCoordinatorAddress, entranceFee, subscriptionId, keyHash, gasLimit];
    const Lottery = await deploy("Lottery", {
       from: deployer,
       args: arg,
@@ -65,10 +50,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
    });
 
    // Verify
-   if (
-      !developmentChains.includes(network.name) &&
-      process.env.ETHERSCAN_API_KEY
-   ) {
+   if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
       log("Verifying .....");
 
       await verify(Lottery.address, arg);
@@ -76,10 +58,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
    }
 
    if (developmentChains.includes(network.name)) {
-      const vrfCoordinatorMock = await ethers.getContractAt(
-         "VRFCoordinatorV2_5Mock",
-         vrfCoordinatorAddress
-      );
+      const vrfCoordinatorMock = await ethers.getContractAt("VRFCoordinatorV2_5Mock", vrfCoordinatorAddress);
 
       //Hey Chainlink (or our mock), let this contract (Lottery) use the subscription | means Lottery is the user or consumer
       await vrfCoordinatorMock.addConsumer(subscriptionId, Lottery.address);

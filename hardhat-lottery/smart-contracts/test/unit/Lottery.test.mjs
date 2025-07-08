@@ -2,10 +2,7 @@ import hardhat from "hardhat";
 const { deployments, ethers, getNamedAccounts, network } = hardhat;
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import {
-   developmentChains,
-   networkConfig,
-} from "../../helper-hardhat-config.js";
+import { developmentChains, networkConfig } from "../../helper-hardhat-config.js";
 import "@nomicfoundation/hardhat-chai-matchers";
 
 chai.use(chaiAsPromised);
@@ -27,15 +24,9 @@ const { expect } = chai;
 
            //get contract
            Lottery = await deployments.get("Lottery");
-           Lottery = await ethers.getContractAt(
-              "Lottery",
-              Lottery.address,
-              signer
-           );
+           Lottery = await ethers.getContractAt("Lottery", Lottery.address, signer);
 
-           VRFCoordinatorV2_5Mock = await deployments.get(
-              "VRFCoordinatorV2_5Mock"
-           );
+           VRFCoordinatorV2_5Mock = await deployments.get("VRFCoordinatorV2_5Mock");
            VRFCoordinatorV2_5Mock = await ethers.getContractAt(
               "VRFCoordinatorV2_5Mock",
               VRFCoordinatorV2_5Mock.address,
@@ -66,16 +57,10 @@ const { expect } = chai;
            });
 
            it("Should emit event when we but the ticket", async () => {
-              await expect(Lottery.buyTicket({ value: sendValue })).to.emit(
-                 Lottery,
-                 "TicketBought"
-              );
+              await expect(Lottery.buyTicket({ value: sendValue })).to.emit(Lottery, "TicketBought");
            });
            it("Should emit event when we but the ticket", async () => {
-              await expect(Lottery.buyTicket({ value: sendValue })).to.emit(
-                 Lottery,
-                 "TicketBought"
-              );
+              await expect(Lottery.buyTicket({ value: sendValue })).to.emit(Lottery, "TicketBought");
            });
 
            it("if lottry state is close then player can't purchase the ticket", async () => {
@@ -88,9 +73,10 @@ const { expect } = chai;
               //   });
 
               await Lottery.test_setStateToCalculating(); // change the state manually
-              await expect(
-                 Lottery.buyTicket({ value: sendValue })
-              ).to.be.revertedWithCustomError(Lottery, "Lottery__NotOpen");
+              await expect(Lottery.buyTicket({ value: sendValue })).to.be.revertedWithCustomError(
+                 Lottery,
+                 "Lottery__NotOpen"
+              );
            });
         });
         describe("checkUpkeep", () => {
@@ -170,9 +156,7 @@ const { expect } = chai;
               // it upkeepNeeded will be false
               //   const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
 
-              await expect(
-                 Lottery.performUpkeep([])
-              ).to.be.revertedWithCustomError(
+              await expect(Lottery.performUpkeep([])).to.be.revertedWithCustomError(
                  Lottery,
                  "Lottery__UpkeepNotNeeded"
               );
@@ -194,9 +178,7 @@ const { expect } = chai;
               const tx = await Lottery.performUpkeep("0x");
               const receipt = await tx.wait(1);
 
-              const requestEvent = receipt.events?.find(
-                 (e) => e.event === "RequestLotteryWinner"
-              );
+              const requestEvent = receipt.events?.find((e) => e.event === "RequestLotteryWinner");
 
               // 5: here we get requestId
               const requestId = requestEvent.args.requestId;
@@ -224,38 +206,57 @@ const { expect } = chai;
            });
 
            it("only be called after requestRandomWinner", async () => {
-              await expect(
-                 VRFCoordinatorV2_5Mock.fulfillRandomWords(0, Lottery.address)
-              ).to.be.revertedWithCustomError(
+              await expect(VRFCoordinatorV2_5Mock.fulfillRandomWords(0, Lottery.address)).to.be.revertedWithCustomError(
                  VRFCoordinatorV2_5Mock,
                  "InvalidRequest"
               );
-              await expect(
-                 VRFCoordinatorV2_5Mock.fulfillRandomWords(1, Lottery.address)
-              ).to.be.revertedWithCustomError(
+              await expect(VRFCoordinatorV2_5Mock.fulfillRandomWords(1, Lottery.address)).to.be.revertedWithCustomError(
                  VRFCoordinatorV2_5Mock,
                  "InvalidRequest"
               );
            });
            it("pick a winner , reset lottery , and send money", async () => {
-              // we are adding new players and connecting with contact  to but ticket
-              const TotalPlayers = 3; //  0 = deployer
-              const accounts = ethers.getSigners();
+              const accounts = await ethers.getSigners();
+              //   const sendValue = ethers.utils.parseEther("0.1");
+              const TotalPlayers = 3;
 
               for (let i = 1; i <= TotalPlayers; i++) {
-                 const lotteryConnect = await Lottery.connect(accounts[i]);
-                 await lotteryConnect.buyTicket({ sendValue });
+                 await Lottery.connect(accounts[i]).buyTicket({ value: sendValue });
               }
 
-              // get time stamp
               const startingTimeStamp = await Lottery.getLastestTimeStamp();
 
-              // 1 : performUpkeep --> 2 : requestRandomWinner --> 3: fulfillRandomWords
-              // we will have to wait to fulfillRandomWords to be called
+              await new Promise(async (resolve, reject) => {
+                 try {
+                    Lottery.once("WinnerPicked", async () => {
+                       try {
+                          const recentWinner = await Lottery.getRecentWinner();
+                          const lotteryState = await Lottery.getLotteryState();
+                          const endingTimeStamp = await Lottery.getLastestTimeStamp();
 
-              await new Promise(resolve, (rejecet) => {
-                 //here we are setting our listner - if the event is not fired in 40 sec then it cause the failed test case
-                 Lottery.once("WinnerPicked", () => {});
+                          expect(recentWinner).to.not.equal(ethers.constants.AddressZero);
+                          expect(lotteryState.toString()).to.equal("0");
+                          expect(endingTimeStamp).to.be.gt(startingTimeStamp);
+
+                          resolve();
+                       } catch (error) {
+                          reject(error);
+                       }
+                    });
+
+                    // 1. Call performUpkeep
+                    const tx = await Lottery.performUpkeep("0x");
+                    const txReceipt = await tx.wait(1);
+
+                    // 2. Extract requestId
+                    const requestEvent = txReceipt.events.find((e) => e.event === "RequestLotteryWinner");
+                    const requestId = requestEvent.args.requestId;
+
+                    // 3. Fulfill randomness using the mock
+                    await VRFCoordinatorV2_5Mock.fulfillRandomWords(requestId, Lottery.address);
+                 } catch (error) {
+                    reject(error);
+                 }
               });
            });
         });
