@@ -56,7 +56,10 @@ const { expect } = chai;
         });
         describe("Lottery Ticket purchase ", () => {
            it("Should fail if not enough ETH is sent", async () => {
-              await expect(Lottery.buyTicket()).to.be.rejected;
+              await expect(Lottery.buyTicket()).to.be.revertedWithCustomError(
+                 Lottery,
+                 "Lottery__NotEnoughETHForEntranceFee"
+              );
            });
 
            it("Should record when player buy the ticket ", async () => {
@@ -68,13 +71,13 @@ const { expect } = chai;
            });
 
            it("Should emit event when we but the ticket", async () => {
-              expect(await Lottery.buyTicket({ value: sendValue })).to.emit(
+              await expect(Lottery.buyTicket({ value: sendValue })).to.emit(
                  Lottery,
                  "TicketBought"
               );
            });
            it("Should emit event when we but the ticket", async () => {
-              expect(await Lottery.buyTicket({ value: sendValue })).to.emit(
+              await expect(Lottery.buyTicket({ value: sendValue })).to.emit(
                  Lottery,
                  "TicketBought"
               );
@@ -90,8 +93,9 @@ const { expect } = chai;
               //   });
 
               await Lottery.test_setStateToCalculating(); // change the state manually
-              await expect(Lottery.buyTicket({ value: sendValue })).to.be
-                 .rejected;
+              await expect(
+                 Lottery.buyTicket({ value: sendValue })
+              ).to.be.revertedWithCustomError(Lottery, "Lottery__NotOpen");
            });
         });
         describe("checkUpkeep", () => {
@@ -104,7 +108,7 @@ const { expect } = chai;
               });
               //callStatic simulate the function don't change or perform any transection
               const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
-              console.log("upkeepNeeded :: ", upkeepNeeded);
+              //   console.log("upkeepNeeded :: ", upkeepNeeded);
 
               expect(!upkeepNeeded);
            });
@@ -123,7 +127,7 @@ const { expect } = chai;
               await Lottery.test_setStateToCalculating();
               // upkeepNeeded returns false
               const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
-              console.log("upkeepNeeded :: ", upkeepNeeded);
+              //   console.log("upkeepNeeded :: ", upkeepNeeded);
 
               expect(!upkeepNeeded);
            });
@@ -151,7 +155,6 @@ const { expect } = chai;
 
            it("Should only run when checkUpkeep is true ", async () => {
               await Lottery.buyTicket({ value: sendValue });
-
               await network.provider.send("evm_increaseTime", [31]);
               await network.provider.request({
                  method: "evm_mine",
@@ -160,13 +163,25 @@ const { expect } = chai;
 
               //callStatic simulate the function don't change or perform any transection
               const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
-              console.log("upkeepNeeded :: inthe perfm ke", upkeepNeeded);
+              //   console.log("upkeepNeeded :: inthe perfm ke", upkeepNeeded);
+
               const tx = await Lottery.performUpkeep([]);
               const recipt = await tx.wait();
-
-              console.log("tx", tx);
+              //   console.log("tx", tx);
 
               expect(tx);
+           });
+           it("Should revert when checkUpkeep is false", async () => {
+              // it upkeepNeeded will be false
+              //   const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
+
+              await expect(
+                 Lottery.performUpkeep([])
+              ).to.be.revertedWithCustomError(
+                 Lottery,
+                 "Lottery__UpkeepNotNeeded"
+              );
+              // rejected also works
            });
         });
      });
