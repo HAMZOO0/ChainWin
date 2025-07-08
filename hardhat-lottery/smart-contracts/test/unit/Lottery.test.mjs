@@ -178,7 +178,7 @@ const { expect } = chai;
               );
               // rejected also works
            });
-           it("Should run RequestLotteryWinner and emit winner", async () => {
+           it("Should run RequestLotteryWinner() and emit winner", async () => {
               // 1 : upkeepNeeded true
               await Lottery.buyTicket({ value: sendValue });
               await network.provider.send("evm_increaseTime", [31]);
@@ -210,6 +210,53 @@ const { expect } = chai;
               expect(requestEvent).to.not.be.undefined;
               expect(requestId.toNumber() > 0);
               expect(lotteryState).to.equal(1);
+           });
+        });
+        describe("RequestLotteryWinner", () => {
+           beforeEach(async () => {
+              // 1 : upkeepNeeded true
+              await Lottery.buyTicket({ value: sendValue });
+              await network.provider.send("evm_increaseTime", [31]);
+              await network.provider.request({
+                 method: "evm_mine",
+                 params: [],
+              });
+           });
+
+           it("only be called after requestRandomWinner", async () => {
+              await expect(
+                 VRFCoordinatorV2_5Mock.fulfillRandomWords(0, Lottery.address)
+              ).to.be.revertedWithCustomError(
+                 VRFCoordinatorV2_5Mock,
+                 "InvalidRequest"
+              );
+              await expect(
+                 VRFCoordinatorV2_5Mock.fulfillRandomWords(1, Lottery.address)
+              ).to.be.revertedWithCustomError(
+                 VRFCoordinatorV2_5Mock,
+                 "InvalidRequest"
+              );
+           });
+           it("pick a winner , reset lottery , and send money", async () => {
+              // we are adding new players and connecting with contact  to but ticket
+              const TotalPlayers = 3; //  0 = deployer
+              const accounts = ethers.getSigners();
+
+              for (let i = 1; i <= TotalPlayers; i++) {
+                 const lotteryConnect = await Lottery.connect(accounts[i]);
+                 await lotteryConnect.buyTicket({ sendValue });
+              }
+
+              // get time stamp
+              const startingTimeStamp = await Lottery.getLastestTimeStamp();
+
+              // 1 : performUpkeep --> 2 : requestRandomWinner --> 3: fulfillRandomWords
+              // we will have to wait to fulfillRandomWords to be called
+
+              await new Promise(resolve, (rejecet) => {
+                 //here we are setting our listner - if the event is not fired in 40 sec then it cause the failed test case
+                 Lottery.once("WinnerPicked", () => {});
+              });
            });
         });
      });

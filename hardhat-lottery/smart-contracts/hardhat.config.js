@@ -57,4 +57,7 @@ module.exports = {
       // currencyDisplayPrecision: 8, // ← force display of small USD costs
       // noColors: true,
    },
+   mocha: {
+      setTimeout: 40000, //   40  sec
+   },
 };
