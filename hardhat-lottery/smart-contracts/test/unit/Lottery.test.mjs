@@ -41,11 +41,6 @@ const { expect } = chai;
               VRFCoordinatorV2_5Mock.address,
               signer
            );
-           //   // ✅ Add lottery as a consumer
-           //   await VRFCoordinatorV2_5Mock.addConsumer(0, Lottery.address);
-
-           //   console.log("VRFCoordinatorV2Mock :: ", Lottery);
-           //   console.log("Lottery :: ", VRFCoordinatorV2Mock);
         });
 
         describe("Constructor", () => {
@@ -182,6 +177,35 @@ const { expect } = chai;
                  "Lottery__UpkeepNotNeeded"
               );
               // rejected also works
+           });
+           it("Should run RequestLotteryWinner and emit winner", async () => {
+              // 1 : upkeepNeeded true
+              await Lottery.buyTicket({ value: sendValue });
+              await network.provider.send("evm_increaseTime", [31]);
+              await network.provider.request({
+                 method: "evm_mine",
+                 params: [],
+              });
+              // 2:  print upkeepNeeded is true
+              const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
+              console.log("upkeepNeeded ", upkeepNeeded);
+
+              // 3: Call performUpkeep and expect event emitted
+              const tx = await Lottery.performUpkeep("0x");
+              const receipt = await tx.wait(1);
+
+              const requestEvent = receipt.events?.find(
+                 (e) => e.event === "RequestLotteryWinner"
+              );
+
+              // 5: here we get requestId
+              const requestId = requestEvent.args.requestId;
+
+              console.log("🎯 requestId:", requestId.toString());
+
+              //   console.log("requestEvent ::  ", requestEvent);
+
+              expect(requestEvent).to.not.be.undefined;
            });
         });
      });
