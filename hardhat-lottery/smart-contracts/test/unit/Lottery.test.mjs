@@ -200,12 +200,16 @@ const { expect } = chai;
 
               // 5: here we get requestId
               const requestId = requestEvent.args.requestId;
-
               console.log("🎯 requestId:", requestId.toString());
 
-              //   console.log("requestEvent ::  ", requestEvent);
+              //  6 : lottery state will be calculating
+              const lotteryState = await Lottery.getLotteryState();
+              console.log("lottery state :: ", lotteryState);
+              // console.log("requestEvent ::  ", requestEvent);
 
               expect(requestEvent).to.not.be.undefined;
+              expect(requestId.toNumber() > 0);
+              expect(lotteryState).to.equal(1);
            });
         });
      });
