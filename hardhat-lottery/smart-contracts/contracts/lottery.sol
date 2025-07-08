@@ -13,6 +13,7 @@ import "hardhat/console.sol"; // testing logs
 import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol"; // for chainlink keeper
+// import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 /*error */
 error Lottery__NotEnoughETHForEntranceFee();

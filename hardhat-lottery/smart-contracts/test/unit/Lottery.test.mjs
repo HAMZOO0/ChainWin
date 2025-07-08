@@ -2,7 +2,10 @@ import hardhat from "hardhat";
 const { deployments, ethers, getNamedAccounts, network } = hardhat;
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import { developmentChains } from "../../helper-hardhat-config.js";
+import {
+   developmentChains,
+   networkConfig,
+} from "../../helper-hardhat-config.js";
 import "@nomicfoundation/hardhat-chai-matchers";
 
 chai.use(chaiAsPromised);
@@ -11,7 +14,7 @@ const { expect } = chai;
 !developmentChains.includes(network.name)
    ? describe.skip
    : describe("Lottery Testing ...", () => {
-        let Lottery, VRFCoordinatorV2Mock, signer;
+        let Lottery, VRFCoordinatorV2_5Mock, signer;
         const sendValue = ethers.utils.parseEther("0.1"); // 1 ETH
 
         beforeEach(async () => {
@@ -30,12 +33,16 @@ const { expect } = chai;
               signer
            );
 
-           VRFCoordinatorV2Mock = await deployments.get("VRFCoordinatorV2Mock");
-           VRFCoordinatorV2Mock = await ethers.getContractAt(
-              "VRFCoordinatorV2Mock",
-              VRFCoordinatorV2Mock.address,
+           VRFCoordinatorV2_5Mock = await deployments.get(
+              "VRFCoordinatorV2_5Mock"
+           );
+           VRFCoordinatorV2_5Mock = await ethers.getContractAt(
+              "VRFCoordinatorV2_5Mock",
+              VRFCoordinatorV2_5Mock.address,
               signer
            );
+           //   // ✅ Add lottery as a consumer
+           //   await VRFCoordinatorV2_5Mock.addConsumer(0, Lottery.address);
 
            //   console.log("VRFCoordinatorV2Mock :: ", Lottery);
            //   console.log("Lottery :: ", VRFCoordinatorV2Mock);
@@ -154,8 +161,9 @@ const { expect } = chai;
               //callStatic simulate the function don't change or perform any transection
               const { upkeepNeeded } = await Lottery.callStatic.checkUpkeep([]);
               console.log("upkeepNeeded :: inthe perfm ke", upkeepNeeded);
-              const tx = await Lottery.performUpkeep;
-              [];
+              const tx = await Lottery.performUpkeep([]);
+              const recipt = await tx.wait();
+
               console.log("tx", tx);
 
               expect(tx);

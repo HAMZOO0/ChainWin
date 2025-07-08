@@ -8,6 +8,7 @@ require("dotenv").config();
 const BASE_FEE = ethers.utils.parseEther("0.24"); //It's the flat LINK fee for every VRF request. This is charged no matter what.
 const GAS_PRICE_LINK = 1e9;
 //? Total Fee = (BASE_FEE + GAS_USED × GAS_PRICE_LINK) × (1 + Premium %)
+const MOCK_LINK_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000"; // dummy address or deploy mock token
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
    const { log, deploy } = deployments;
@@ -18,13 +19,13 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       log(`${network.name} Local Network Detected So We Use Mock Contract`);
 
       // deploying a MockV3Aggregator
-      const MockV3Aggregator = await deploy("VRFCoordinatorV2Mock", {
+      const MockV3Aggregator = await deploy("VRFCoordinatorV2_5Mock", {
          from: deployer,
-         args: [BASE_FEE, GAS_PRICE_LINK],
+         args: [BASE_FEE, GAS_PRICE_LINK, MOCK_LINK_TOKEN_ADDRESS],
          log: true,
          waitConfirmations: network.config.blockConfirmation || 1,
       });
-      log("VRFCoordinatorV2Mock is Deployed !");
+      log("VRFCoordinatorV2_5Mock is Deployed !");
       log("----------------------------------------------------");
    }
 };

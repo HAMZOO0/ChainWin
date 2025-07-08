@@ -7,7 +7,7 @@ const { verify } = require("../utils/verify.util.js");
 require("dotenv").config();
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
-   let vrfCoordinator, subscriptionId; // address  , id
+   let vrfCoordinatorAddress, subscriptionId; // address  , id
    const networkName = network.name;
    const { log, deploy, get } = deployments;
 
@@ -15,27 +15,31 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
    if (developmentChains.includes(network.name)) {
       //Mock
-      const vrfCoordinatorDeployment = await get("VRFCoordinatorV2Mock");
+      const vrfCoordinatorDeployment = await get("VRFCoordinatorV2_5Mock");
       const vrfCoordinatorMock = await ethers.getContractAt(
-         "VRFCoordinatorV2Mock",
+         "VRFCoordinatorV2_5Mock",
          vrfCoordinatorDeployment.address
       );
 
-      vrfCoordinator = vrfCoordinatorMock.address;
+      // setting vrfCoordinator - constructor argument
+      vrfCoordinatorAddress = vrfCoordinatorMock.address;
 
       //Create Subscription Automatically
       const tx = await vrfCoordinatorMock.createSubscription();
       const txRecipt = await tx.wait(1);
       subscriptionId = txRecipt.events[0].args.subId;
       // subscriptionId = txRecipt.events[0].args.subId.toNumber();
+
       //Fund it with LINK (Mock uses ETH)
       await vrfCoordinatorMock.fundSubscription(
          subscriptionId,
          ethers.utils.parseEther("10")
       );
+
+      // Add Lottery contract as consumer to the subscription
    } else {
       // address setup
-      vrfCoordinator = networkConfig[networkName].vrfCoordinator;
+      vrfCoordinatorAddress = networkConfig[networkName].vrfCoordinator;
       console.log("vrfCoordinator = networkConfig['sepolia']", vrfCoordinator);
 
       // subscription
@@ -46,7 +50,13 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
    const keyHash = networkConfig[networkName].keyHash;
    // console.log("Deploying with keyHash:", keyHash);
    const gasLimit = networkConfig[networkName].callbackGasLimit;
-   const arg = [vrfCoordinator, entranceFee, subscriptionId, keyHash, gasLimit];
+   const arg = [
+      vrfCoordinatorAddress,
+      entranceFee,
+      subscriptionId,
+      keyHash,
+      gasLimit,
+   ];
    const Lottery = await deploy("Lottery", {
       from: deployer,
       args: arg,
@@ -64,6 +74,17 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       await verify(Lottery.address, arg);
       log("Verification Done ");
    }
+
+   if (developmentChains.includes(network.name)) {
+      const vrfCoordinatorMock = await ethers.getContractAt(
+         "VRFCoordinatorV2_5Mock",
+         vrfCoordinatorAddress
+      );
+
+      //Hey Chainlink (or our mock), let this contract (Lottery) use the subscription | means Lottery is the user or consumer
+      await vrfCoordinatorMock.addConsumer(subscriptionId, Lottery.address);
+   }
+
    log("------------------------------------------");
 };
 module.exports.tags = ["Sepolia", "All"];
