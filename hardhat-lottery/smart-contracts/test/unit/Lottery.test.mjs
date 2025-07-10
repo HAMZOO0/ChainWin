@@ -12,7 +12,7 @@ const { expect } = chai;
    ? describe.skip
    : describe("Lottery Testing ...", () => {
         let Lottery, VRFCoordinatorV2_5Mock, signer;
-        const sendValue = ethers.utils.parseEther("0.1"); // 1 ETH
+        const sendValue = ethers.utils.parseEther("1"); // 1 ETH
 
         beforeEach(async () => {
            // get signer
@@ -220,6 +220,14 @@ const { expect } = chai;
            it("pick a winner , reset lottery , and send money", async () => {
               // 1 : performUpkeep --> 2 : requestRandomWinner --> 3: fulfillRandomWords
               // we will have to wait to fulfillRandomWords to be called
+              // we are adding new players and connecting with contact  to but ticket
+              const TotalPlayers = 3; //  0 = deployer
+              const accounts = await ethers.getSigners();
+
+              for (let i = 1; i <= TotalPlayers; i++) {
+                 const lotteryConnect = await Lottery.connect(accounts[i]);
+                 await lotteryConnect.buyTicket({ value: sendValue });
+              }
 
               // get time stamp
               startingTimeStamp = await Lottery.getLastestTimeStamp();
@@ -228,13 +236,27 @@ const { expect } = chai;
                  //here we are setting our listner - if the event is not fired in 40 sec then it cause the failed test case
                  Lottery.once("WinnerPicked", async () => {
                     try {
+                       console.log("Event Founded !!!!!");
+                       console.log(accounts[0].address);
+                       console.log(accounts[1].address);
+                       console.log(accounts[2].address);
+                       console.log(accounts[3].address);
+
                        const recentWinner = await Lottery.getRecentWinner();
                        const lotteryState = await Lottery.getLotteryState();
                        const endingTimeStamp = await Lottery.getLastestTimeStamp();
-                       expect(endingTimeStamp).to.be.gt(startingTimeStamp);
                        const numPlaayers = await Lottery.getNumberOfPlayers();
-                       console.log(recentWinner);
 
+                       console.log("winner :: ", recentWinner);
+                       const winnerBalance = await ethers.provider.getBalance(recentWinner);
+                       console.log("winner balance:: ", ethers.utils.formatEther(winnerBalance));
+
+                       const playerSendValue = ethers.utils.parseEther("1");
+
+                     //   console.log(playerSendValue.mul(4).add(winnerStartingBalance));
+                       expect(playerSendValue.mul(4).add(winnerStartingBalance)).to.equal(winnerBalance);
+
+                       expect(endingTimeStamp).to.be.gt(startingTimeStamp);
                        expect(numPlaayers.toString()).to.equal("0");
                        expect(lotteryState.toString()).to.equal("0");
                        expect(endingTimeStamp).to.be.gt(startingTimeStamp);
@@ -243,6 +265,11 @@ const { expect } = chai;
                     }
                     resolve();
                  });
+
+                 const winnerStartingBalance = await accounts[1].getBalance();
+                 const totalContractBalance = await ethers.provider.getBalance(Lottery.address);
+                 console.log("winnerStartingBalance :: ", ethers.utils.formatEther(winnerStartingBalance));
+                 console.log("totalContractBalance :: ", ethers.utils.formatEther(totalContractBalance));
 
                  const tx = await Lottery.performUpkeep("0x");
                  const receipt = await tx.wait(1);
