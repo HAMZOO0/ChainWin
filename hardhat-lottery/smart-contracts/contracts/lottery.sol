@@ -123,7 +123,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
                         callbackGasLimit: i_callbackGasLimit,
                         numWords: NUM_WORDS,
                         extraArgs: VRFV2PlusClient._argsToBytes(
-                            VRFV2PlusClient.ExtraArgsV1({nativePayment: true})
+                            VRFV2PlusClient.ExtraArgsV1({nativePayment: false})
                         )
                     })
             );
@@ -140,7 +140,6 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         s_recentWinner = winner;
 
         s_lotteryState = LotteryState.OPEN;
-        delete s_players;
 
         (bool success, ) = winner.call{value: address(this).balance}("");
         // require(success, "Winner Transfer Failed ");
@@ -148,6 +147,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
             revert Lottery__WinnerTransferFailed();
         }
         emit WinnerPicked(winner); //?  if it not work then replace with s_recentWinner
+        delete s_players;
     }
 
     /*
@@ -171,7 +171,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         bool hasPlayers = s_players.length > 0;
         bool hasBalance = address(this).balance > 0;
         bool isOpen = s_lotteryState == LotteryState.OPEN;
-        // console.log("current balance :: ", address(this).balance);
+
         upkeepNeeded = isTime && hasPlayers && hasBalance && isOpen;
     }
 
@@ -212,8 +212,8 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         return s_lastTimeStamp;
     }
 
-    function getRequestConfirmation() public pure returns (uint16) {
-        return REQUEST_CONFIRMATIONS;
+    function getSubscriptionId() public view returns (uint256) {
+        return i_subscriptionId;
     }
     function test_setStateToCalculating() public {
         s_lotteryState = LotteryState.CALCULATING;

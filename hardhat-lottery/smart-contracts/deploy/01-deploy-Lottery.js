@@ -22,7 +22,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       const tx = await vrfCoordinatorMock.createSubscription();
       const txRecipt = await tx.wait(1);
       subscriptionId = txRecipt.events[0].args.subId;
-      // subscriptionId = txRecipt.events[0].args.subId.toNumber();
+
+      //Fund it with LINK (Mock uses ETH)
+      await vrfCoordinatorMock.fundSubscription(subscriptionId, ethers.utils.parseEther("10"));
 
       //Fund it with LINK (Mock uses ETH)
       await vrfCoordinatorMock.fundSubscription(subscriptionId, ethers.utils.parseEther("10"));
@@ -31,7 +33,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
    } else {
       // address setup
       vrfCoordinatorAddress = networkConfig[networkName].vrfCoordinator;
-      console.log("vrfCoordinator = networkConfig['sepolia']", vrfCoordinator);
+      console.log("vrfCoordinator = networkConfig['sepolia']", vrfCoordinatorAddress);
 
       // subscription
       subscriptionId = networkConfig[networkName].subscriptionId;

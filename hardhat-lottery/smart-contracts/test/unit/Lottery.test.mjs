@@ -182,7 +182,6 @@ const { expect } = chai;
 
               // 5: here we get requestId
               const requestId = requestEvent.args.requestId;
-              console.log("🎯 requestId:", requestId.toString());
 
               //  6 : lottery state will be calculating
               const lotteryState = await Lottery.getLotteryState();
@@ -195,6 +194,8 @@ const { expect } = chai;
            });
         });
         describe("RequestLotteryWinner", () => {
+           let accounts;
+           let startingTimeStamp; // Declare startingTimeStamp here
            beforeEach(async () => {
               // 1 : upkeepNeeded true
               await Lottery.buyTicket({ value: sendValue });
@@ -203,6 +204,7 @@ const { expect } = chai;
                  method: "evm_mine",
                  params: [],
               });
+              accounts = await ethers.getSigners(); // Assign accounts here
            });
 
            it("only be called after requestRandomWinner", async () => {
@@ -216,40 +218,29 @@ const { expect } = chai;
               );
            });
            it("pick a winner , reset lottery , and send money", async () => {
-              // we are adding new players and connecting with contact  to but ticket
-              const TotalPlayers = 3; //  0 = deployer
-              const accounts = await ethers.getSigners();
-
-              for (let i = 1; i <= TotalPlayers; i++) {
-                 const lotteryConnect = await Lottery.connect(accounts[i]);
-                 await lotteryConnect.buyTicket({ value: sendValue });
-              }
-
-              // get time stamp
-              const startingTimeStamp = await Lottery.getLastestTimeStamp();
-
               // 1 : performUpkeep --> 2 : requestRandomWinner --> 3: fulfillRandomWords
               // we will have to wait to fulfillRandomWords to be called
+
+              // get time stamp
+              startingTimeStamp = await Lottery.getLastestTimeStamp();
 
               await new Promise(async (resolve, rejecet) => {
                  //here we are setting our listner - if the event is not fired in 40 sec then it cause the failed test case
                  Lottery.once("WinnerPicked", async () => {
                     try {
-                       console.log("Event Founded !!!!!");
-                       console.log(accounts[0].address);
-                       console.log(accounts[1].address);
-                       console.log(accounts[2].address);
-                       console.log(accounts[3].address);
-
                        const recentWinner = await Lottery.getRecentWinner();
                        const lotteryState = await Lottery.getLotteryState();
                        const endingTimeStamp = await Lottery.getLastestTimeStamp();
+                       expect(endingTimeStamp).to.be.gt(startingTimeStamp);
                        const numPlaayers = await Lottery.getNumberOfPlayers();
-                       console.log("Winner ::", recentWinner);
+                       console.log(recentWinner);
 
                        expect(numPlaayers.toString()).to.equal("0");
                        expect(lotteryState.toString()).to.equal("0");
-                    } catch (error) {}
+                       expect(endingTimeStamp).to.be.gt(startingTimeStamp);
+                    } catch (error) {
+                       rejecet(error);
+                    }
                     resolve();
                  });
 
