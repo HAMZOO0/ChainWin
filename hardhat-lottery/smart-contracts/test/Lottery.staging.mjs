@@ -29,8 +29,8 @@ developmentChains.includes(network.name)
            entranceFee = await Lottery.getEntranceFee();
 
            // Reset the state before each test
-           const tx = await Lottery.test_resetState();
-           await tx.wait(1);
+           //   const tx = await Lottery.test_resetState();
+           //   await tx.wait(1);
 
            const state = await Lottery.getLotteryState();
            console.log("Lottery State:", state.toString()); // should be 0 (OPEN)
@@ -38,11 +38,12 @@ developmentChains.includes(network.name)
 
         describe("fulfillRandomWords", () => {
            it("works with live Chainlink Keepers and VRF", async function () {
+              
               const winnerPickedPromise = new Promise((resolve, reject) => {
                  const timeout = setTimeout(() => {
                     reject(new Error("Timeout waiting for WinnerPicked event"));
                  }, 300000); // 5 minutes
-
+               
                  Lottery.on("WinnerPicked", async () => {
                     clearTimeout(timeout);
                     try {

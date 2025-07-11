@@ -95,7 +95,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     }
 
     /* buyTicket */
-        function buyTicket() public payable {
+    function buyTicket() public payable {
         emit DebugTicketValues(msg.value, i_entranceFee);
         // Revert if not enough ETH sent for player
         if (msg.value < i_entranceFee) {
@@ -215,16 +215,5 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     function getSubscriptionId() public view returns (uint256) {
         return i_subscriptionId;
     }
-    function test_setStateToCalculating() public {
-        s_lotteryState = LotteryState.CALCULATING;
-    }
-
-    function _resetState() internal {
-        console.log("Resetting lottery state to OPEN");
-        s_lotteryState = LotteryState.OPEN;
-    }
-
-    function test_resetState() public {
-        _resetState();
-    }
+  
 }
