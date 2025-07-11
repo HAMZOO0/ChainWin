@@ -3,7 +3,7 @@ const { ethers } = require("hardhat");
 const networkConfig = {
    sepolia: {
       vrfCoordinator: "0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B",
-      entranceFee: ethers.utils.parseEther("0.01"),
+      entranceFee: ethers.utils.parseEther("0.0001"),
 
       subscriptionId: "52704553669593647193056605671921566117744581563379245173496672858513823778418",
       keyHash: "0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae",

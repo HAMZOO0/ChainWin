@@ -70,6 +70,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     event TicketBought(address indexed player);
     event RequestLotteryWinner(uint256 indexed requestId); // request id
     event WinnerPicked(address indexed playerIndex);
+    event DebugTicketValues(uint256 msgValue, uint256 entranceFee);
 
     /* constructor */
     constructor(
@@ -94,7 +95,8 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     }
 
     /* buyTicket */
-    function buyTicket() public payable {
+        function buyTicket() public payable {
+        emit DebugTicketValues(msg.value, i_entranceFee);
         // Revert if not enough ETH sent for player
         if (msg.value < i_entranceFee) {
             revert Lottery__NotEnoughETHForEntranceFee();
@@ -138,16 +140,14 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         uint256 winnerIndex = randomWords[0] % s_players.length;
         address payable winner = s_players[winnerIndex];
         s_recentWinner = winner;
-
         s_lotteryState = LotteryState.OPEN;
-
+        s_players = new address payable[](0);
+        s_lastTimeStamp = block.timestamp;
         (bool success, ) = winner.call{value: address(this).balance}("");
-        // require(success, "Winner Transfer Failed ");
         if (!success) {
             revert Lottery__WinnerTransferFailed();
         }
-        emit WinnerPicked(winner); //?  if it not work then replace with s_recentWinner
-        delete s_players;
+        emit WinnerPicked(winner);
     }
 
     /*
@@ -217,5 +217,14 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     }
     function test_setStateToCalculating() public {
         s_lotteryState = LotteryState.CALCULATING;
+    }
+
+    function _resetState() internal {
+        console.log("Resetting lottery state to OPEN");
+        s_lotteryState = LotteryState.OPEN;
+    }
+
+    function test_resetState() public {
+        _resetState();
     }
 }

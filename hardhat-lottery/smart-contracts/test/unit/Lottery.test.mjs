@@ -18,7 +18,7 @@ const { expect } = chai;
            // get signer
            const { deploy } = await getNamedAccounts();
            signer = await ethers.getSigner(deploy);
-
+            
            // deploy
            await deployments.fixture(["All"]);
 
