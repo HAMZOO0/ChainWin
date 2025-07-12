@@ -78,6 +78,44 @@ The contract uses Chainlink VRF to request a random number. This happens **autom
 
 ---
 
+## ⚙️ System Workflow
+
+The lottery operates in a cyclical, automated fashion. Here’s a step-by-step breakdown of the process from a player entering to a winner being chosen.
+
+### 1. Player Buys a Ticket
+
+A user calls the `buyTicket()` function and sends the required `entranceFee` in ETH. Their address is then added to the list of players for the current round.
+
+![Player buying a ticket on Etherscan](pics/image-2.png)
+
+### 2. Chainlink Automation Triggers the Draw
+
+Chainlink Automation (Keepers) continuously monitor the contract off-chain by calling `checkUpkeep()`. The upkeep is performed if the following conditions are met:
+- The lottery state is `OPEN`.
+- A specific time interval has passed since the last draw.
+- There is at least one player in the lottery.
+- The contract has a balance to pay the winner.
+
+When these conditions are true, the Keeper calls `performUpkeep()`, which begins the process of selecting a winner.
+
+![Chainlink Automation job executing](pics/image.png)
+
+### 3. Requesting a Random Number via Chainlink VRF
+
+The `performUpkeep()` function requests one or more random numbers from the Chainlink VRF Coordinator. This is a secure, on-chain request for verifiable randomness.
+
+![VRF call transaction on Etherscan](pics/image-1.png)
+
+### 4. Winner Selection and Payout
+
+After a few blocks, the Chainlink VRF Coordinator responds by calling the `fulfillRandomWords()` function in our contract, delivering the random number. This function then performs the final steps:
+1.  Uses the random number to select a `recentWinner` from the array of players.
+2.  Transfers the entire contract balance (the prize pool) to the winner.
+3.  Resets the lottery state, clearing the players list and opening it for a new round.
+
+---
+
+
 ## 📦 Installation
 
 ```bash
@@ -175,15 +213,13 @@ Add screenshots of your DApp UI, VRF/Automation dashboards, and test results her
 ---
 
 Feel free to contribute or open issues for improvements!
+
 ---
 
+## 📊 Additional Diagrams
 
-Player Buy  ticket 
-![alt text](image-2.png)
+### Chainlink VRF Workflow
+![VRF Full Diagram](pics/image-3.png)
 
-Vrf Call 
-![alt text](image-1.png)
-
-
-here is the chainlink keeper responce : 
-![alt text](image.png)
+### Chainlink Automation (Keepers) Workflow
+![Keepers Diagram](pics/image-4.png)
