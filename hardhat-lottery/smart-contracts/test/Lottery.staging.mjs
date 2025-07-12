@@ -4,11 +4,13 @@
 // 4 : Register the contract with Chainlink Keepers
 // 5 : Run the Staging Tests
 
+//!!! -->  fix all this ai code with ffc and unit test
+
 import hardhat from "hardhat";
 const { deployments, ethers, getNamedAccounts, network } = hardhat;
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import { developmentChains, networkConfig } from "../helper-hardhat-config.js";
+import { developmentChains } from "../helper-hardhat-config.js";
 import "@nomicfoundation/hardhat-chai-matchers";
 
 chai.use(chaiAsPromised);
@@ -17,16 +19,16 @@ const { expect } = chai;
 developmentChains.includes(network.name)
    ? describe.skip
    : describe("Lottery Staging test", function () {
-        this.timeout(300000); // wait 5 min for Keepers + VRF
-
         let signer, Lottery, entranceFee;
 
         beforeEach(async () => {
            const { deployer } = await getNamedAccounts();
+           console.log("deployer :: ", deployer);
+
            signer = await ethers.getSigner(deployer);
            const deployment = await deployments.get("Lottery");
            Lottery = await ethers.getContractAt("Lottery", deployment.address, signer);
-           entranceFee = await Lottery.getEntranceFee();
+           entranceFee = await Lottery.getEntranceFee(); // 0.0001 eth
 
            // Reset the state before each test
            //   const tx = await Lottery.test_resetState();
@@ -38,14 +40,25 @@ developmentChains.includes(network.name)
 
         describe("fulfillRandomWords", () => {
            it("works with live Chainlink Keepers and VRF", async function () {
-              
-              const winnerPickedPromise = new Promise((resolve, reject) => {
-                 const timeout = setTimeout(() => {
-                    reject(new Error("Timeout waiting for WinnerPicked event"));
-                 }, 300000); // 5 minutes
-               
-                 Lottery.on("WinnerPicked", async () => {
-                    clearTimeout(timeout);
+              this.timeout(300000); // wait up to 5 minutes
+              console.log("Setting up test...");
+              const startingTimeStamp = await Lottery.getLastestTimeStamp();
+              const accounts = await ethers.getSigners();
+
+              // Buy ticket
+              try {
+                 const tx = await Lottery.buyTicket({ value: entranceFee });
+                 await tx.wait(1);
+                 const winnerStatingBalance = await accounts[0].getBalance();
+                 console.log("winnerStatingBalance", await ethers.utils.formatEther(winnerStatingBalance));
+              } catch (error) {
+                 console.error("❌ Error buying ticket:", error);
+                 throw error;
+              }
+
+              // Wait for the WinnerPicked event
+              return new Promise((resolve, reject) => {
+                 Lottery.once("WinnerPicked", async () => {
                     try {
                        console.log("🎉 WinnerPicked event fired!");
 
@@ -55,28 +68,20 @@ developmentChains.includes(network.name)
                        const numPlayers = await Lottery.getNumberOfPlayers();
                        const winnerBalance = await ethers.provider.getBalance(recentWinner);
 
-                       console.log("winner :: ", recentWinner);
-                       console.log("winner balance:: ", ethers.utils.formatEther(winnerBalance));
+                       console.log("Recent Winner:", recentWinner);
+                       console.log("Expected Winner:", accounts[0].address);
+                       console.log("Winner Balance:", ethers.utils.formatEther(winnerBalance));
 
-                       expect(lotteryState.toString()).to.equal("0"); // OPEN state
+                       expect(recentWinner.toString()).to.equal(accounts[0].address);
+                       expect(lotteryState.toString()).to.equal("0"); // Should be open again
                        expect(numPlayers.toString()).to.equal("0");
                        expect(endingTimeStamp).to.be.gt(startingTimeStamp);
                        resolve();
-                    } catch (error) {
-                       reject(error);
+                    } catch (err) {
+                       reject(err);
                     }
                  });
               });
-
-              try {
-                 const tx = await Lottery.buyTicket({ value: entranceFee });
-                 await tx.wait(1);
-              } catch (error) {
-                 console.error("Error buying ticket:", error);
-                 throw error;
-              }
-
-              await winnerPickedPromise;
            });
         });
      });

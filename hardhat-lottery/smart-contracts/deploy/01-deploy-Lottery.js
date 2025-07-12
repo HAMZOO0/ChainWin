@@ -9,6 +9,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
    const { log, deploy, get } = deployments;
 
    const { deployer } = await getNamedAccounts();
+   console.log("deployer", deployer);
 
    if (developmentChains.includes(network.name)) {
       //Mock

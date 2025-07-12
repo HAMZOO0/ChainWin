@@ -175,3 +175,15 @@ Add screenshots of your DApp UI, VRF/Automation dashboards, and test results her
 ---
 
 Feel free to contribute or open issues for improvements!
+---
+
+
+Player Buy  ticket 
+![alt text](image-2.png)
+
+Vrf Call 
+![alt text](image-1.png)
+
+
+here is the chainlink keeper responce : 
+![alt text](image.png)
