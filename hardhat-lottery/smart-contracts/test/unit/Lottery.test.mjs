@@ -2,7 +2,7 @@ import hardhat from "hardhat";
 const { deployments, ethers, getNamedAccounts, network } = hardhat;
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import { developmentChains, networkConfig } from "../../helper-hardhat-config.js";
+import { developmentChains } from "../../helper-hardhat-config.js";
 import "@nomicfoundation/hardhat-chai-matchers";
 
 chai.use(chaiAsPromised);
@@ -18,7 +18,7 @@ const { expect } = chai;
            // get signer
            const { deploy } = await getNamedAccounts();
            signer = await ethers.getSigner(deploy);
-            
+
            // deploy
            await deployments.fixture(["All"]);
 
@@ -253,7 +253,7 @@ const { expect } = chai;
 
                        const playerSendValue = ethers.utils.parseEther("1");
 
-                     //   console.log(playerSendValue.mul(4).add(winnerStartingBalance));
+                       //   console.log(playerSendValue.mul(4).add(winnerStartingBalance));
                        expect(playerSendValue.mul(4).add(winnerStartingBalance)).to.equal(winnerBalance);
 
                        expect(endingTimeStamp).to.be.gt(startingTimeStamp);
