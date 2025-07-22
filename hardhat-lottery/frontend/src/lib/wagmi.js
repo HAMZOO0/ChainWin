@@ -1,14 +1,12 @@
+// lib/wagmiConfig.js
 "use client";
 
-import { createConfig, http } from "wagmi";
+import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { sepolia } from "wagmi/chains";
-import { injected } from "@wagmi/connectors"; // ✅ fix
 
-export const config = createConfig({
+export const config = getDefaultConfig({
+   appName: "My Lottery Dapp",
+   projectId: "21d16285404834f540703b1912f52b98", // 🔑 create at https://cloud.walletconnect.com
    chains: [sepolia],
-   connectors: [injected()], // ✅ this must be called
-   transports: {
-      [sepolia.id]: http(),
-   },
    ssr: true,
 });
