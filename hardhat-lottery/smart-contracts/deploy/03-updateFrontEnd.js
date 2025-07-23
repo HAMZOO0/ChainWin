@@ -21,7 +21,13 @@ async function UpdatingContractAddresses() {
    // get older address
    const currentAddresses = JSON.parse(fs.readFileSync(FRONT_END_ADDRESS_FILE, "utf-8"));
 
-   const chainId = await network.config.chainId.toString();
+   const chainId = (
+      network.config.chainId ||
+      network.chainId ||
+      (await ethers.provider.getNetwork()).chainId
+   ).toString();
+
+   console.log("chainId ->>>", chainId);
 
    // If we already have this chainId in the file
    if (currentAddresses[chainId]) {
