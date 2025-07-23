@@ -1,7 +1,7 @@
 "use client";
-import { useContractRead, useContractWrite, usePrepareContractWrite, useChainId, useReadContract } from "wagmi";
+import { useContractRead, useWriteContract, useChainId } from "wagmi";
 import { sepolia, hardhat } from "viem/chains";
-import { formatEther } from "viem";
+import { formatEther, parseEther } from "viem";
 
 const { abi, contractAddress } = require("../../constants/index.js");
 
@@ -19,6 +19,22 @@ export default function LotteryEntrance() {
       functionName: "getEntranceFee",
       watch: true,
    });
+
+   const { writeContract, data, isPending, error } = useWriteContract();
+
+   const handleClick = async () => {
+      try {
+         await writeContract({
+            address: contractAddressForChain,
+            abi: abi,
+            functionName: "buyTicket",
+            enabled: Boolean(entranceFee), // make sure entranceFee is ready
+            value: entranceFee,
+         });
+      } catch (e) {}
+   };
+
+   console.log("writeContract :: ", writeContract);
 
    console.log("Current Chain ID:", chainId);
    console.log("isLoading:", isLoading);
@@ -39,6 +55,11 @@ export default function LotteryEntrance() {
                Entrance Fee: <strong>{formatEther(entranceFee)} ETH</strong>
             </p>
          )}
+
+         <button onClick={handleClick} disabled={isPending}>
+            {isPending ? "Processing..." : "Enter Lottery"}
+         </button>
+         {error && <p style={{ color: "red" }}>{error.message}</p>}
       </div>
    );
 }
