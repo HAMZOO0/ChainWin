@@ -1,7 +1,8 @@
 "use client";
-import { useContractRead, useWriteContract, useChainId } from "wagmi";
+import { useContractRead, useWriteContract, useChainId, waitForTransactionReceipt } from "wagmi";
 import { sepolia, hardhat } from "viem/chains";
 import { formatEther, parseEther } from "viem";
+import toast from "react-hot-toast";
 
 const { abi, contractAddress } = require("../../constants/index.js");
 
@@ -24,24 +25,38 @@ export default function LotteryEntrance() {
 
    const handleClick = async () => {
       try {
-         await writeContract({
+         toast.loading("🎟️ Buying ticket...");
+
+         const tx = writeContract({
             address: contractAddressForChain,
             abi: abi,
             functionName: "buyTicket",
+            watch: false,
             enabled: Boolean(entranceFee), // make sure entranceFee is ready
-            value: entranceFee,
+            value: BigInt(entranceFee),
          });
-      } catch (e) {}
+         toast.dismiss();
+         toast.loading("⛓️ Waiting for transaction confirmation...");
+
+         // Wait for confirmation
+         const receipt = await waitForTransactionReceipt({ tx });
+         toast.dismiss();
+         toast.success("✅ Ticket bought successfully!");
+         console.log("receipt ==>", receipt);
+      } catch (e) {
+         toast.dismiss();
+         toast.error("❌ Transaction failed.");
+         console.error("Buy ticket error:", e);
+      }
    };
 
-   console.log("writeContract :: ", writeContract);
-
-   console.log("Current Chain ID:", chainId);
-   console.log("isLoading:", isLoading);
-   console.log("isError:", isError);
-   console.log("entranceFee:", entranceFee);
-   // console.log("abi:", abi);
-   console.log("contract address:", contractAddress);
+   console.log("📛 Chain ID:", chainId);
+   console.log("📜 Contract Address:", contractAddressForChain);
+   console.log(
+      "🧾 ABI Function Names:",
+      abi.map((fn) => fn?.name || "undefined")
+   );
+   console.log("💰 Entrance Fee:", entranceFee?.toString());
 
    return (
       <div>

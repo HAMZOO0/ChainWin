@@ -3,5 +3,5 @@ const contractAddress = require("./contractAddress.json");
 
 module.exports = {
    abi,
-   contractAddress,
+   contractAddress,  
 };

@@ -51,7 +51,8 @@ developmentChains.includes(network.name)
                  await tx.wait(1);
                  const winnerStatingBalance = await accounts[0].getBalance();
                  console.log("winnerStatingBalance", await ethers.utils.formatEther(winnerStatingBalance));
-              } catch (error) {
+              } catch (error)
+              {
                  console.error("❌ Error buying ticket:", error);
                  throw error;
               }
