@@ -1,4 +1,0 @@
-/* globals.css or any main css file */
-
-@import "tailwindcss/preflight";  /* replaces @tailwind base */
-@tailwind utilities;              /* keep this */
