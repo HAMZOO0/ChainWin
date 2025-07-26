@@ -89,7 +89,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         //!  i_gasLane = gasLane;
 
         // keepers
-        i_interval = 30; // 30 sec
+        i_interval = 3600; // 30 sec then i changed it to 1 hour
         s_lastTimeStamp = block.timestamp;
         s_lotteryState = LotteryState.OPEN;
     }
@@ -202,7 +202,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     function getNumWords() public pure returns (uint32) {
         return NUM_WORDS;
     }
-
+    // get number of player
     function getNumberOfPlayers() public view returns (uint256) {
         return s_players.length;
     }

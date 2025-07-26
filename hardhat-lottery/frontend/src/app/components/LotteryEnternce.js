@@ -70,7 +70,9 @@ export default function LotteryEntrance() {
       address: contractAddressForChain,
       abi: abi,
       functionName: "getRecentWinner",
+      // refetchInterval: 5000, // auto-refresh every 5 seconds
       watch: true,
+      // cacheTime: 0, // avoid stale cached data
    });
 
    console.log("📛 Chain ID:", chainId);
@@ -85,7 +87,9 @@ export default function LotteryEntrance() {
 
    return (
       <div>
-         <h2 className="text-lg font-semibold">🎟️ Lottery Entrance</h2>
+         <h2 className="text-3xl font-bold text-blue-600 hover:text-red-500 transition duration-300">
+            🎟️ Lottery Entrance
+         </h2>{" "}
          {isLoadingFee ? (
             <p>Loading fee...</p>
          ) : isErrorFee || !entranceFee ? (
@@ -95,7 +99,6 @@ export default function LotteryEntrance() {
                Entrance Fee: <strong>{formatEther(entranceFee)} ETH</strong>
             </p>
          )}
-
          <button onClick={handleClick} disabled={isPending}>
             {isPending ? "Processing..." : "Enter Lottery"}
          </button>
