@@ -20,10 +20,9 @@ export default function NavBar() {
             {/* Navigation Links */}
             <div className="flex items-center gap-6">
                <NavLink href="https://personal-portfolio-phi-mocha.vercel.app/" text="Developer" />
-               <NavLink href="https://github.com/your-repo" text="GitHub" />
+               <NavLink href="https://github.com/HAMZOO0/ChainWin" text="GitHub" />
                <NavLink href="/how-it-works" text="How It Works" />
                <NavLink href="https://docs.chain.link/" text="Chainlink Docs" />
-               
 
                {/* Enhanced Connect Button */}
                <div className="ml-2 ">

@@ -1,8 +1,11 @@
 # 🎟️ Decentralized Lottery DApp
 
+> 🟢 **Live Demo Deployed at:** [https://imaginative-creponne-075b15.netlify.app/](https://imaginative-creponne-075b15.netlify.app/)
+
 This is a fully decentralized lottery smart contract built with Solidity and Hardhat. It allows users to buy lottery tickets and automatically picks a random winner using Chainlink VRF (Verifiable Random Function) and Chainlink Automation (Keepers).
 
----
+
+
 
 ## 🚀 Features
 
@@ -199,8 +202,11 @@ You can add your frontend code in the `frontend/` directory. Use JavaScript libr
 
 ## 📸 Screenshots
 
-Add screenshots of your DApp UI, VRF/Automation dashboards, and test results here for better documentation.
+![alt text](image.png)
 
+![alt text](image-1.png)
+
+![ ](image-2.png)
 ---
 
 ## 📚 Resources

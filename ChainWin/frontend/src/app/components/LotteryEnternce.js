@@ -45,6 +45,7 @@ export default function LotteryEntrance() {
    });
 
    const { writeContract, isPending, error } = useWriteContract();
+   console.log("Entrece fee::", entranceFee);
 
    const handleClick = async () => {
       try {
@@ -241,45 +242,18 @@ export default function LotteryEntrance() {
                </div>
 
                {/* Tickets Sold */}
-               <div>
-                  {isLoadingPlayer ? (
-                     <motion.div
-                        className="h-6 w-3/4 bg-gray-700 rounded"
-                        animate={{ opacity: [0.6, 1, 0.6] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                     />
-                  ) : isErrorPlayer ? (
-                     <p className="text-red-400">Error loading tickets sold</p>
-                  ) : (
-                     <p className="text-gray-300">
-                        Tickets Sold: <span className="text-blue-400 font-bold">{numerOfPlayers?.toString()}</span>
-                     </p>
-                  )}
-               </div>
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
+                  {/* Tickets Sold Box */}
+                  <div className="bg-gray-900 text-white p-6 rounded-2xl shadow-lg border border-gray-700">
+                     <h2 className="text-xl font-bold mb-2"> Tickets Sold</h2>
+                     <p className="text-3xl font-semibold text-green-400">{numerOfPlayers}</p>
+                  </div>
 
-               {/* Recent Winner */}
-               <div>
-                  {isLoadingRecentWinner ? (
-                     <motion.div
-                        className="h-6 w-full bg-gray-700 rounded"
-                        animate={{ opacity: [0.6, 1, 0.6] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
-                     />
-                  ) : isErrorRecentWinner ? (
-                     <p className="text-red-400">Error loading recent winner</p>
-                  ) : (
-                     <div>
-                        <p className="text-gray-400 mb-1">Recent Winner:</p>
-                        <motion.p
-                           className="text-green-400 text-sm break-all font-mono"
-                           initial={{ opacity: 0 }}
-                           animate={{ opacity: 1 }}
-                           transition={{ delay: 1.2 }}
-                        >
-                           {recentWinner}
-                        </motion.p>
-                     </div>
-                  )}
+                  {/* Recent Winner Box */}
+                  <div className="bg-gray-900 text-white p-6 rounded-2xl shadow-lg border border-gray-700">
+                     <h2 className="text-xl font-bold mb-2">🏆 Recent Winner</h2>
+                     <p className="text-sm text-gray-300 break-words">{recentWinner || "No winner yet"}</p>
+                  </div>
                </div>
 
                {/* Error Message */}
