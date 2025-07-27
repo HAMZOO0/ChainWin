@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
          </head>
          <body>
             {/* ✅ Add Tailwind CDN here */}
-            <Script src="https://cdn.tailwindcss.com" strategy="lazyOnload"></Script>
+            <Script src="https://cdn.tailwindcss.com"></Script>
             <WagmiProvider config={config}>
                <QueryClientProvider client={queryClient}>
                   <RainbowKitProvider>

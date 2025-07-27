@@ -29,6 +29,41 @@ This is a fully decentralized lottery smart contract built with Solidity and Har
 
 ---
 
+
+
+## 📂 Project Structure
+```
+.
+├── ChainWin/
+│   ├── frontend/               # Contains the Next.js frontend application.
+│   │   ├── public/             # Static assets for the frontend.
+│   │   ├── src/                # Source code for the Next.js application.
+│   │   │   ├── app/            # Main application pages and components.
+│   │   │   ├── constants/      # ABI and contract addresses.
+│   │   │   └── lib/            # Wagmi configuration.
+│   │   ├── .next/              # Next.js build output.
+│   │   ├── node_modules/       # Frontend dependencies.
+│   │   └── ...                 # Configuration files (tailwind, postcss, etc.)
+│   │
+│   └── smart-contracts/        # Contains the Hardhat smart contracts project.
+│       ├── contracts/          # Solidity smart contracts (Lottery.sol).
+│       ├── deploy/             # Scripts for deploying contracts.
+│       ├── deployments/        # Deployment artifacts for different networks.
+│       ├── script/             # Helper scripts for interacting with contracts.
+│       ├── test/               # Contract tests (unit and staging).
+│       ├── artifacts/          # Contract compilation artifacts.
+│       ├── cache/              # Hardhat cache.
+│       ├── node_modules/       # Backend dependencies.
+│       └── ...                 # Configuration files (hardhat.config.js, etc.)
+│
+├── .git/                       # Git version control directory.
+└── README.md                   # This file.
+```
+
+
+
+---
+
 ## ⚙️ How It Works
 
 ### 🎫 1. Buying a Ticket
@@ -163,6 +198,8 @@ npx hardhat run scripts/deploy.js --network sepolia
   - VRF Coordinator Address
 - Update your contract/deployment scripts with these values
 
+![Chainlink VRF V2 Setup](pics/vrf2.png)
+
 ### ✅ Automation (Keepers) Setup
 
 - Visit [Chainlink Automation App](https://automation.chain.link/)
@@ -229,3 +266,4 @@ Feel free to contribute or open issues for improvements!
 
 ### Chainlink Automation (Keepers) Workflow
 ![Keepers Diagram](pics/image-4.png)
+  
